@@ -1,14 +1,28 @@
 # NgBudgetBook
 
-A simple app to keep track of expenses and income.
-Technical Features:
+A simple app to keep track of expenses and income. 
+
+## Stack:
+- Firebase as a Backend
+- Angular as a Frontend
+
+## Modules (To be developed):
+- Role-based access priviliges.
+- Chat module: A simplified chatting feature of the app.
+- Budgeting Module: An expense and income tracking module.
+- Task Module: A Simple Kanban-style Task Management.
+- Job Module: A listing of jobs detailing cost, assignment with comments feature.
+
+## Achieved:
+- Email/Password Authentication with Firebase.
+
+## Technical Features:
 - A clean and simple UI/UX.
 - Angular 13.
 - Angular Material Components with Tailwindcss.
 - Single-File Component Convention.
 - Follows Nx-style file organization & architecture.
 
-Give it a try at: https://ng-budget-app.web.app/budget-book
 
 ## Development server
 
