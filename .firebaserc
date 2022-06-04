@@ -1,5 +1,14 @@
 {
   "projects": {
-    "default": "ng-budget-app"
+    "default": "task-men"
+  },
+  "targets": {
+    "task-men": {
+      "hosting": {
+        "ng-task-men": [
+          "task-men"
+        ]
+      }
+    }
   }
 }

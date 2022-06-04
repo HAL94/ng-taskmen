@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "ng-budget-book": {
+    "ng-task-men": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:application": {
@@ -23,7 +23,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/ng-budget-book",
+            "outputPath": "dist/ng-task-men",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -75,10 +75,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "ng-budget-book:build:production"
+              "browserTarget": "ng-task-men:build:production"
             },
             "development": {
-              "browserTarget": "ng-budget-book:build:development"
+              "browserTarget": "ng-task-men:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -86,7 +86,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "ng-budget-book:build"
+            "browserTarget": "ng-task-men:build"
           }
         },
         "test": {
@@ -106,9 +106,19 @@
             ],
             "scripts": []
           }
+        },
+        "deploy": {
+          "builder": "@angular/fire:deploy",
+          "options": {
+            "prerender": false,
+            "ssr": false,
+            "browserTarget": "ng-task-men:build:production",
+            "firebaseProject": "task-men",
+            "firebaseHostingSite": "task-men"
+          }
         }
       }
     }
   },
-  "defaultProject": "ng-budget-book"
+  "defaultProject": "ng-task-men"
 }
