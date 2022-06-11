@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { combineLatest, combineLatestAll, Observable } from 'rxjs';
 import { AuthService } from 'src/app/shared/auth/data-access/auth.service';
+import { FileUploadService } from 'src/app/shared/file-upload/data-access/file-upload.service';
+import { FilePreview } from 'src/app/shared/file-upload/utils/file-preview.interface';
 import { ChatService } from '../../data-access/chat.service';
 
 @Component({
@@ -63,11 +65,15 @@ import { ChatService } from '../../data-access/chat.service';
               
               <div class="w-full">                
                 <input name="message" class="w-full outline-none pl-3 text-sm" ngModel [(ngModel)]="message" type="text" placeholder="Your message..be nice" />
+                <app-file-preview *ngIf="filePreview$ | async as filePreview" [filePreview]="filePreview">                  
+                </app-file-preview>
               </div>
                 
-              <div class=" self-baseline">
-                <app-emoji-picker (selectedEmoji)="message = message + $event"></app-emoji-picker>
+              <div class=" self-baseline flex flex-row">
+                <app-emoji-picker class="mx-1" (selectedEmoji)="message = message + $event"></app-emoji-picker>
+                <app-file-upload class="mx-1"></app-file-upload>
               </div>
+
             </div>
             <div class="ml-4">              
               <button mat-icon-button aria-label="Send Message" type="submit" [disabled]="chatTextForm.invalid" class="disabled:cursor-not-allowed">
@@ -98,15 +104,16 @@ export class ChatMainComponent implements OnInit {
   peers$: Observable<any>;
   chatInfo$: Observable<any>;  
   message = "";
-
+  filePreview$: Observable<FilePreview>;
   
 
-  constructor(public auth: AuthService, public chat: ChatService) {
+  constructor(public auth: AuthService, public chat: ChatService, private upload: FileUploadService) {
     this.startMessagingUser = this.startMessagingUser.bind(this);
   }
 
   ngOnInit(): void {
     this.peers$ = this.chat.getUsersList();
+    this.filePreview$ = this.upload.filePreview;
   }
 
   startMessagingUser(user: any) {
@@ -119,7 +126,7 @@ export class ChatMainComponent implements OnInit {
       user,
     }));
 
-    // this.chatInfo$.subscribe(console.log);
+    this.chatInfo$.subscribe(console.log);
   }
 
   onSendMessage(chatTextForm: NgForm, thatUser: string, chatId: string) {
@@ -129,7 +136,5 @@ export class ChatMainComponent implements OnInit {
       this.chat.sendMessage(content, thatUser, chatId);
       chatTextForm.reset();
     }
-  }
-
-  
+  }  
 }

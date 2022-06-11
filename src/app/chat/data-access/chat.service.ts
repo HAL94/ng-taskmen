@@ -12,13 +12,16 @@ import {
 
 import { map } from 'rxjs';
 import { AuthService } from 'src/app/shared/auth/data-access/auth.service';
+import { FileUploadService } from 'src/app/shared/file-upload/data-access/file-upload.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatService {  
 
-  constructor(private fs: Firestore, private auth: AuthService) {}
+  constructor(private fs: Firestore,
+    private upload: FileUploadService,
+    private auth: AuthService) {}
 
   getUsersList() {
     const colRef = collection(this.fs, 'users');    
@@ -39,7 +42,8 @@ export class ChatService {
   getChat(toUid: string) {
     const { uid } = this.auth.user;    
     const colRef = collection(this.fs, 'chats');    
-    const userInitiatedChats = query(colRef, where(`participants.${uid}`, '==', true), where(`participants.${toUid}`, '==', true));
+    const userInitiatedChats = query(colRef, where(`participants.${uid}`, '==', true),
+     where(`participants.${toUid}`, '==', true));
     return collectionData(userInitiatedChats).pipe(
       // tap((chats) => console.log('fetched something', chats)),
       map((chatArr) => chatArr[0] ? chatArr[0] : {})
@@ -51,9 +55,11 @@ export class ChatService {
     const chatRef = doc(this.fs, `chats/${chatId}`);
     
     let data = (await getDoc(chatRef)).data()
+    let uploadData = await this.upload.uploadFile();
     if (!data) {
       const chatsRef = collection(this.fs, 'chats');
-      console.log(chatsRef, content, `to: ${to}`, `from: ${uid}`);      
+      console.log(chatsRef, content, `to: ${to}`, `from: ${uid}`);
+
       const createdChatRef = await addDoc(chatsRef, {
         createdAt: Date.now(),
         participants: {
@@ -61,12 +67,12 @@ export class ChatService {
           [to]: true
         },
         count: 1,
-        messages: [{ message: content, sender: uid, receiver: to, timestamp: Date.now() }]
+        messages: [{ message: content, sender: uid, receiver: to, timestamp: Date.now(), file: uploadData }]
       })
       
       await updateDoc(createdChatRef, { ...data, id: createdChatRef.id });  
     } else {
-      data['messages'] = [...data['messages'], {sender: uid, message: content, receiver: to, timestamp: Date.now()}];
+      data['messages'] = [...data['messages'], {sender: uid, message: content, receiver: to, timestamp: Date.now(), file: uploadData}];
       await updateDoc(chatRef, data);
     }
   }

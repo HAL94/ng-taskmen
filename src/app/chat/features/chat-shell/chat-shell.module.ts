@@ -8,6 +8,7 @@ import { MyMessageModule } from '../../ui/my-message/my-message.module';
 import { TheirMessageModule } from '../../ui/their-message/their-message.module';
 import materialImports from './material.imports';
 import { EmojiPickerModule } from 'src/app/shared/emoji-picker/emoji-picker.module';
+import { FileUploadModule } from 'src/app/shared/file-upload/file-upload.module';
 
 const routes: Routes = [
   { path: '', component: ChatMainComponent }
@@ -23,6 +24,7 @@ const routes: Routes = [
     MyMessageModule,
     TheirMessageModule,
     EmojiPickerModule,
+    FileUploadModule,
     FormsModule,    
     CommonModule,
     ...materialImports

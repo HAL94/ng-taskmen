@@ -9,6 +9,11 @@ import { Component, Input, OnInit } from '@angular/core';
       >
         {{ message.message }}
       </span>
+      <div *ngIf="message.file">
+        <div *ngIf="message.file.type.startsWith('image')">
+          <img class="rounded-3xl" [src]="message.file.url" width="300" height="100" [alt]="message.file.name" />
+        </div>
+      </div>
       <span class="text-sm text-[#a9a9a9] mr-4 self-end">
         {{timeSent}}
       </span>
