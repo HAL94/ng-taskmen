@@ -3,39 +3,26 @@ import { Injectable } from '@angular/core';
 import { Auth, authState, createUserWithEmailAndPassword, signInWithEmailAndPassword } from '@angular/fire/auth';
 import { Firestore, doc, DocumentReference, docSnapshots, setDoc}from '@angular/fire/firestore';
 import { updateProfile } from '@firebase/auth';
-import { forkJoin, from, map, Observable, of, switchMap } from 'rxjs';
+import { forkJoin, from, map, Observable, of, switchMap, tap } from 'rxjs';
 import { SigninCredentials, SignupCredentials } from '../utils/auth.model';
+import { AvatarGenerator } from 'random-avatar-generator';
+
+
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-
-  
-  private user$: Observable<any | null>;
-
   readonly isLoggedIn$ = authState(this.auth);
 
   doc: DocumentReference;
 
   constructor(private auth: Auth, private firestore: Firestore) {     
-    this.user$ = this.isLoggedIn$.pipe(
-      switchMap((user) => {
-        if (!user) {
-          return of(null);
-        }
-        const docRef = doc(this.firestore, `users/${user?.uid}`)
-        return docSnapshots(docRef).pipe(map((snapshot) => snapshot.data()))      
-      })
-    )
+    
   }
 
-  get user() {
-    return this.user$;
-  }
- 
-  getCurrentUser() {    
+  get user() {    
     return this.auth.currentUser!;
   }
 
@@ -47,9 +34,12 @@ export class AuthService {
     return from(createUserWithEmailAndPassword(this.auth, email, password)).pipe(      
       switchMap(({ user }) => forkJoin([
         updateProfile(user, { displayName }),
-        new Promise(async (resolve, reject) => {          
+        new Promise(async (resolve, reject) => {
+          const generator = new AvatarGenerator();
+          const avatar = generator.generateRandomAvatar();          
+          
           const docRef = doc(this.firestore, `users/${user.uid}`)
-          await setDoc(docRef, { displayName, email, isVerified: user.emailVerified, uid: user.uid })
+          await setDoc(docRef, { displayName, email, isVerified: user.emailVerified, uid: user.uid, photoURL: user.photoURL || avatar })
           resolve(null)
         })        
       ])),

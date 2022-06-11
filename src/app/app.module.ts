@@ -13,10 +13,12 @@ import { environment } from 'src/environments/environment';
 import { HttpClientModule } from '@angular/common/http';
 import { provideFirestore, getFirestore, connectFirestoreEmulator, enableIndexedDbPersistence } from '@angular/fire/firestore';
 import { connectFunctionsEmulator, Functions, FunctionsInstances, getFunctions } from '@angular/fire/functions';
+import { PickerModule } from '@ctrl/ngx-emoji-mart';
+
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,    
   ],
   imports: [
     BrowserModule,
@@ -24,6 +26,7 @@ import { connectFunctionsEmulator, Functions, FunctionsInstances, getFunctions }
     DialogModule,
     BrowserAnimationsModule,
     IconsModule,
+    PickerModule,
     HttpClientModule,
     provideFirebaseApp(() => {
       const app = initializeApp(environment.firebase)

@@ -1,71 +1,135 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { combineLatest, combineLatestAll, Observable } from 'rxjs';
 import { AuthService } from 'src/app/shared/auth/data-access/auth.service';
 import { ChatService } from '../../data-access/chat.service';
 
 @Component({
   selector: 'app-chat-main',
   template: `
-    <div class="grid grid-cols-4 bg-slate-300 h-[700px]">
-      <div class="h-full flex flex-col justify-center items-center col-span-1 border-r">
-        <ul *ngIf="peers$ | async as users" class="my-5 h-full w-full p-4">
-          <li *ngFor="let user of users"
-            (click)="startMessagingUser(user)"
-            class="px-2 py-4 border-b w-full cursor-pointer hover:bg-gray-300"
-          >
-            <div>{{ user.displayName }}</div>
-          </li>
-        </ul>
+    <div class="grid grid-cols-4">
+      <div class="flex flex-col justify-center items-center col-span-1">
+        <app-chat-list
+          [users]="peers$ | async"
+          [onClick]="startMessagingUser"
+          class="h-full w-full px-4 pt-0"
+        ></app-chat-list>
       </div>
-      <div class="h-full flex flex-col justify-center items-center col-span-3" *ngIf="(chat$ | async) as chatInfo">
-        <div class="border-b h-4/5 flex flex-col w-full px-3 py-5">
-          <span *ngFor="let msg of chatInfo?.messages" [ngClass]="msg.sender === auth.getCurrentUser()?.uid ? 'self-end' : 'self-start'">
-            {{msg.message}}
-          </span>
+      <div
+        class="flex flex-col justify-center items-center col-span-3 bg-white rounded-2xl h-full"
+        *ngIf="chatInfo$ | async as chatInfo"
+      >
+        <div class="w-full border-b border-[#F7F7F7] mx-3 px-3 py-3">
+          <div class="flex flex-row">
+            <img
+              [src]="chatInfo.user.photoURL"
+              [alt]="chatInfo.user.displayName"
+              width="50"
+              height="50"
+            />
+            <div
+              class="flex flex-col justify-center items-start self-center mx-4"
+            >
+              <span class="text-xl text-[#5a5a5a]">{{
+                chatInfo.user.displayName
+              }}</span>
+              <span class="text-sm text-[#a9a9a9]">Last seen: 4:19 PM</span>
+            </div>
+          </div>
         </div>
+        <div
+          class="flex flex-col w-full px-20 py-5 h-[700px] overflow-y-auto"
+          id="chat-area"
+        >
+          <ng-container *ngFor="let msg of chatInfo.chat?.messages">
+            <app-my-message
+              *ngIf="msg.sender === auth.user?.uid; else theirMessage"
+              [message]="msg"
+            ></app-my-message>
+            <ng-template #theirMessage>
+              <app-their-message [message]="msg"></app-their-message>
+            </ng-template>
+          </ng-container>
+        </div>        
         <div class="w-full">
-          <form #chatTextForm="ngForm" (ngSubmit)="onSendMessage(chatTextForm, chatInfo.id)" class="flex flex-row justify-evenly items-center w-full">
-            <mat-form-field class="w-4/5">
-              <mat-label>Message</mat-label>
-              <input name="message" ngModel type="text" matInput placeholder="Your message..be nice" />
-            </mat-form-field>
-
-            <button type="submit" mat-raised-button color="accent" [disabled]="chatTextForm.invalid" class="disabled:cursor-not-allowed">
-              Send
-            </button>
+          <form
+            #chatTextForm="ngForm"
+            (ngSubmit)="
+              onSendMessage(chatTextForm, chatInfo.user.uid, chatInfo.chat?.id)
+            "
+            class="flex flex-row items-center w-full px-20 relative"
+          >
+            <div class="bg-transparent flex flex-row px-2 py-2 my-2 justify-end items-center min-w-0 flex-grow border rounded-3xl">
+              
+              <div class="w-full">                
+                <input name="message" class="w-full outline-none pl-3 text-sm" ngModel [(ngModel)]="message" type="text" placeholder="Your message..be nice" />
+              </div>
+                
+              <div class=" self-baseline">
+                <app-emoji-picker (selectedEmoji)="message = message + $event"></app-emoji-picker>
+              </div>
+            </div>
+            <div class="ml-4">              
+              <button mat-icon-button aria-label="Send Message" type="submit" [disabled]="chatTextForm.invalid" class="disabled:cursor-not-allowed">
+                <mat-icon class="text-[#8b8e95]">send</mat-icon>
+              </button>
+            </div>
           </form>
         </div>
       </div>
     </div>
-    
   `,
-  styles: [],
+  styles: [
+    `
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background-color: rgb(216, 216, 216);
+        border-radius: 40px;
+      }
+      ::-webkit-scrollbar-track {
+        background-color: transparent;
+      }
+    `,
+  ],
 })
 export class ChatMainComponent implements OnInit {
-  peers$: Observable<any>;  
-  chat$: Observable<any>;
+  peers$: Observable<any>;
+  chatInfo$: Observable<any>;  
+  message = "";
 
-  selectedUser: any;
+  
 
-  constructor(public auth: AuthService, public chat: ChatService) {}
+  constructor(public auth: AuthService, public chat: ChatService) {
+    this.startMessagingUser = this.startMessagingUser.bind(this);
+  }
 
   ngOnInit(): void {
-    this.peers$ = this.chat.getUsersList();    
+    this.peers$ = this.chat.getUsersList();
   }
 
   startMessagingUser(user: any) {
-    this.chat$ = this.chat.getChat(user.uid);
-    // this.chat$.subscribe(console.log);    
-    this.selectedUser = user.uid;
+    const chat$ = this.chat.getChat(user.uid);
+
+    const clickedUser$ = this.chat.getUserInfo(user.uid);
+
+    this.chatInfo$ = combineLatest(chat$, clickedUser$, (chat, user) => ({
+      chat,
+      user,
+    }));
+
+    // this.chatInfo$.subscribe(console.log);
   }
 
-  onSendMessage(chatTextForm: NgForm, chatId: string) {
+  onSendMessage(chatTextForm: NgForm, thatUser: string, chatId: string) {
     console.log('submitting', chatTextForm.value);
     if (chatTextForm.value['message'] !== '') {
       const content = chatTextForm.value['message'];
-      this.chat.sendMessage(content, this.selectedUser, chatId);
+      this.chat.sendMessage(content, thatUser, chatId);
       chatTextForm.reset();
     }
   }
+
+  
 }

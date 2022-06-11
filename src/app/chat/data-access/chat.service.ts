@@ -7,7 +7,8 @@ import {
   getDoc,
   collection,
   collectionData,
-  query, where } from '@angular/fire/firestore';
+  query, where
+} from '@angular/fire/firestore';
 
 import { map } from 'rxjs';
 import { AuthService } from 'src/app/shared/auth/data-access/auth.service';
@@ -15,17 +16,28 @@ import { AuthService } from 'src/app/shared/auth/data-access/auth.service';
 @Injectable({
   providedIn: 'root'
 })
-export class ChatService {
+export class ChatService {  
+
   constructor(private fs: Firestore, private auth: AuthService) {}
 
   getUsersList() {
     const colRef = collection(this.fs, 'users');    
-    const users = query(colRef, where('uid', '!=', this.auth.getCurrentUser().uid))
-    return collectionData(users);    
+    const users = query(colRef, where('uid', '!=', this.auth.user.uid))
+    const users$ = collectionData(users);
+    return users$;
   }
 
+  getUserInfo(userId: string) {
+    // console.log('getting user data', userId);
+    const colRef = collection(this.fs, 'users');    
+    const userDoc = query(colRef, where('uid', '==', userId));
+    return collectionData(userDoc).pipe(
+      map((data) => data[0]),      
+    )
+  }
+ 
   getChat(toUid: string) {
-    const { uid } = this.auth.getCurrentUser();    
+    const { uid } = this.auth.user;    
     const colRef = collection(this.fs, 'chats');    
     const userInitiatedChats = query(colRef, where(`participants.${uid}`, '==', true), where(`participants.${toUid}`, '==', true));
     return collectionData(userInitiatedChats).pipe(
@@ -35,7 +47,7 @@ export class ChatService {
   }
 
   async sendMessage(content: string, to: string, chatId?: string) {
-    const { uid } = this.auth.getCurrentUser();
+    const { uid } = this.auth.user;
     const chatRef = doc(this.fs, `chats/${chatId}`);
     
     let data = (await getDoc(chatRef)).data()
@@ -49,12 +61,12 @@ export class ChatService {
           [to]: true
         },
         count: 1,
-        messages: [{ message: content, sender: uid, receiver: to }]
+        messages: [{ message: content, sender: uid, receiver: to, timestamp: Date.now() }]
       })
       
       await updateDoc(createdChatRef, { ...data, id: createdChatRef.id });  
     } else {
-      data['messages'] = [...data['messages'], {sender: uid, message: content, receiver: to}];
+      data['messages'] = [...data['messages'], {sender: uid, message: content, receiver: to, timestamp: Date.now()}];
       await updateDoc(chatRef, data);
     }
   }

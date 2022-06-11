@@ -27,7 +27,7 @@ import { AuthService } from './shared/auth/data-access/auth.service';
       </ng-container>
     </mat-toolbar>
 
-    <main class="content mat-app-background">
+    <main class="content bg-main-bg">
       <router-outlet></router-outlet>
     </main>
 
