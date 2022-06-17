@@ -8,6 +8,11 @@ import { Component, Input, OnInit } from '@angular/core';
         class="text-green-500 relative bg-[#f5f7fb] my-1 py-3 px-3 rounded-tl-0 rounded-tr-[30px] rounded-br-[30px] rounded-bl-[30px]"
       >
         {{ message.message }}
+        <div *ngIf="message.file" class="mt-4">
+          <div *ngIf="message.file.type.startsWith('image')">
+            <img class="rounded-3xl" [src]="message.file.url" width="300" height="100" [alt]="message.file.name" />
+          </div>
+        </div>
       </span>
       <span class="text-sm text-[#a9a9a9] ml-4 self-start">{{ timeSent }}</span>
     </div>

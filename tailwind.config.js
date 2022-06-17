@@ -3,6 +3,11 @@ module.exports = {
     "./src/**/*.{html,ts}",
   ],
   theme: {
+    lineClamp: {
+      1: 1,
+      2: 2,
+      3: 3
+    },
     extend: {
       backgroundColor: {
         'main-bg': '#f5f7fb',
@@ -13,5 +18,7 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('tailwindcss-line-clamp')
+  ],
 }

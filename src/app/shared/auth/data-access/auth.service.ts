@@ -6,6 +6,7 @@ import { updateProfile } from '@firebase/auth';
 import { forkJoin, from, map, Observable, of, switchMap, tap } from 'rxjs';
 import { SigninCredentials, SignupCredentials } from '../utils/auth.model';
 import { AvatarGenerator } from 'random-avatar-generator';
+import { updateDoc } from '@firebase/firestore';
 
 
 
@@ -27,7 +28,14 @@ export class AuthService {
   }
 
   signIn({ email, password }: SigninCredentials) {
-    return from(signInWithEmailAndPassword(this.auth, email, password))
+    return from(signInWithEmailAndPassword(this.auth, email, password)).pipe(
+      tap(async (userCredentials) => {
+        if (userCredentials) {
+          const docRef = doc(this.firestore, `users/${userCredentials.user.uid}`);
+          await updateDoc(docRef, { isOnline: true });
+        }
+      })
+    )
   }
 
   signUp({ email, password, displayName }: SignupCredentials) {
@@ -39,14 +47,19 @@ export class AuthService {
           const avatar = generator.generateRandomAvatar();          
           
           const docRef = doc(this.firestore, `users/${user.uid}`)
-          await setDoc(docRef, { displayName, email, isVerified: user.emailVerified, uid: user.uid, photoURL: user.photoURL || avatar })
+          await setDoc(docRef, { displayName, email, isVerified: user.emailVerified, uid: user.uid, isOnline: true, photoURL: user.photoURL || avatar })
           resolve(null)
         })        
       ])),
     );
   }
 
-  signOut() {    
-    return from(this.auth.signOut());
+  signOut() {
+    const user = this.user;    
+    return from(this.auth.signOut()).pipe(
+      tap(async () => {
+        await updateDoc(doc(this.firestore, `users/${user.uid}`), { isOnline: false })
+      })
+    );
   }
 }

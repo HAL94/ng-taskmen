@@ -13,12 +13,11 @@ import { ChatService } from '../../data-access/chat.service';
       <div class="flex flex-col justify-center items-center col-span-1">
         <app-chat-list
           [users]="peers$ | async"
-          [onClick]="startMessagingUser"
+          [onClick]="startMessagingUser"          
           class="h-full w-full px-4 pt-0"
         ></app-chat-list>
       </div>
-      <div
-        class="flex flex-col justify-center items-center col-span-3 bg-white rounded-2xl h-full"
+      <div class="flex flex-col justify-center items-center col-span-3 bg-white rounded-2xl h-full"
         *ngIf="chatInfo$ | async as chatInfo"
       >
         <div class="w-full border-b border-[#F7F7F7] mx-3 px-3 py-3">
@@ -114,6 +113,7 @@ export class ChatMainComponent implements OnInit {
   ngOnInit(): void {
     this.peers$ = this.chat.getUsersList();
     this.filePreview$ = this.upload.filePreview;
+    // this.peers$.subscribe(result => console.log('someting', result));
   }
 
   startMessagingUser(user: any) {
@@ -126,7 +126,7 @@ export class ChatMainComponent implements OnInit {
       user,
     }));
 
-    this.chatInfo$.subscribe(console.log);
+    // this.chatInfo$.subscribe(console.log);
   }
 
   onSendMessage(chatTextForm: NgForm, thatUser: string, chatId: string) {
