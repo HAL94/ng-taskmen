@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { combineLatest, combineLatestAll, Observable } from 'rxjs';
+import { combineLatest, combineLatestAll, Observable, Subscription } from 'rxjs';
 import { AuthService } from 'src/app/shared/auth/data-access/auth.service';
 import { FileUploadService } from 'src/app/shared/file-upload/data-access/file-upload.service';
 import { FilePreview } from 'src/app/shared/file-upload/utils/file-preview.interface';
 import { ChatService } from '../../data-access/chat.service';
+import { LastElementDirective } from './last-element.directive';
 
 @Component({
   selector: 'app-chat-main',
@@ -41,6 +42,7 @@ import { ChatService } from '../../data-access/chat.service';
         <div
           class="flex flex-col w-full px-20 py-5 h-[700px] overflow-y-auto"
           id="chat-area"
+          lastElement
         >
           <ng-container *ngFor="let msg of chatInfo.chat?.messages">
             <app-my-message
@@ -99,15 +101,21 @@ import { ChatService } from '../../data-access/chat.service';
     `,
   ],
 })
-export class ChatMainComponent implements OnInit {
+export class ChatMainComponent implements OnInit, OnDestroy {
   peers$: Observable<any>;
   chatInfo$: Observable<any>;  
   message = "";
   filePreview$: Observable<FilePreview>;
-  
+  subChat: Subscription;
+  @ViewChild(LastElementDirective) lastElementDir: LastElementDirective;
 
   constructor(public auth: AuthService, public chat: ChatService, private upload: FileUploadService) {
     this.startMessagingUser = this.startMessagingUser.bind(this);
+  }
+  ngOnDestroy(): void {
+    if (this.subChat) {
+      this.subChat.unsubscribe();
+    }
   }
 
   ngOnInit(): void {
@@ -126,6 +134,14 @@ export class ChatMainComponent implements OnInit {
       user,
     }));
 
+    this.subChat = chat$.subscribe(() => {
+      if (this.lastElementDir) {
+        setTimeout(() => {
+          this.lastElementDir.scrollToBottom();
+        }, 0)
+      }
+    })
+    
     // this.chatInfo$.subscribe(console.log);
   }
 
@@ -135,6 +151,7 @@ export class ChatMainComponent implements OnInit {
       const content = chatTextForm.value['message'];
       this.chat.sendMessage(content, thatUser, chatId);
       chatTextForm.reset();
+      
     }
   }  
 }
