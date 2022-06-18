@@ -45,19 +45,19 @@ import { provideStorage, StorageModule } from '@angular/fire/storage'
     }),
     provideAuth(() => {
       const auth = getAuth();
-      connectAuthEmulator(auth, 'http://localhost:9099')
+      // connectAuthEmulator(auth, 'http://localhost:9099')
       return auth
     }),
     provideFirestore(() => {
       const firestore = getFirestore();      
-      connectFirestoreEmulator(firestore, 'localhost', 8888);
-      enableIndexedDbPersistence(firestore);
+      // connectFirestoreEmulator(firestore, 'localhost', 8888);
+      // enableIndexedDbPersistence(firestore);
       return firestore;
     }),
     provideStorage(() => {
       const app = getApp();
       const storage = getStorage(app);
-      connectStorageEmulator(storage, "localhost", 9199);
+      // connectStorageEmulator(storage, "localhost", 9199);
       return storage;
     }),        
     ...materialImports
