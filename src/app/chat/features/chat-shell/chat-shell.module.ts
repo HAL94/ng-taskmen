@@ -1,35 +1,30 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ChatMainComponent } from './chat-main.component';
+import { ChatShellComponent } from './chat-shell.component';
 import { RouterModule, Routes } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { ChatListModule } from '../../ui/chat-list/chat-list.module';
-import { MyMessageModule } from '../../ui/my-message/my-message.module';
-import { TheirMessageModule } from '../../ui/their-message/their-message.module';
-import materialImports from './material.imports';
-import { EmojiPickerModule } from 'src/app/shared/emoji-picker/emoji-picker.module';
-import { FileUploadModule } from 'src/app/shared/file-upload/file-upload.module';
-import { LastElementDirective } from './last-element.directive';
+
+import { ChatUsersModule } from '../../ui/chat-users/chat-users.module';
+import { ChatFormModule } from '../chat-form/chat-form.module';
+import { ChatHeaderModule } from '../../ui/chat-header/chat-header.module';
+import { ChatAreaModule } from '../chat-area/chat-area.module';
+import { AutoScrollModule } from '../../utils/auto-scroll/auto-scroll.module';
 
 const routes: Routes = [
-  { path: '', component: ChatMainComponent }
+  { path: '', component: ChatShellComponent }
 ]
 
 @NgModule({
   declarations: [
-    ChatMainComponent,
-    LastElementDirective
+    ChatShellComponent
   ],
   imports: [
     RouterModule.forChild(routes),
-    ChatListModule,
-    MyMessageModule,
-    TheirMessageModule,
-    EmojiPickerModule,
-    FileUploadModule,
-    FormsModule,    
-    CommonModule,
-    ...materialImports
+    ChatUsersModule,    
+    ChatFormModule,    
+    ChatHeaderModule,
+    ChatAreaModule,
+    AutoScrollModule,
+    CommonModule
   ]
 })
 export class ChatShellModule { }

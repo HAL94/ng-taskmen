@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-chat-list',
+  selector: 'chat-users',
   template: `
     <ul *ngIf="users" class="bg-white rounded-2xl">
       <li
@@ -50,7 +50,7 @@ import { Component, Input, OnInit } from '@angular/core';
     `,
   ],
 })
-export class ChatListComponent implements OnInit {
+export class ChatUsersComponent implements OnInit {
   @Input() users: any[];
   @Input() onClick: Function;
 

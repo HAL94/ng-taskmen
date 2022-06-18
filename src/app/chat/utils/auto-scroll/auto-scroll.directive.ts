@@ -1,9 +1,9 @@
-import { AfterViewChecked, AfterViewInit, Directive, ElementRef } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef } from '@angular/core';
 
 @Directive({
-  selector: '[lastElement]'
+  selector: '[autoScroll]'
 })
-export class LastElementDirective implements AfterViewInit {
+export class AutoScrollDirective implements AfterViewInit {
 
   constructor(private element: ElementRef) { }
 
