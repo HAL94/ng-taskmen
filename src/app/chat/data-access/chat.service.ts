@@ -9,15 +9,26 @@ import {
   collectionData,
   query,
   where,
+  collectionSnapshots,
+  onSnapshot,
+  collectionChanges,
 } from '@angular/fire/firestore';
 
 import {
+  BehaviorSubject,
+  combineLatest,
   combineLatestAll,
   concatMap,
+  exhaustMap,
+  filter,
   map,
+  mergeAll,
+  mergeMap,
   of,
   switchMap,
   take,
+  tap,
+  toArray,
 } from 'rxjs';
 import { AuthService } from 'src/app/shared/auth/data-access/auth.service';
 import { FileUploadService } from 'src/app/shared/file-upload/data-access/file-upload.service';
@@ -30,24 +41,24 @@ export class ChatService {
     private fs: Firestore,
     private upload: FileUploadService,
     private auth: AuthService
-  ) {}
-
-  getUsersList() {
+  ) {
     const colRef = collection(this.fs, 'users');
+
     const users = query(colRef, where('uid', '!=', this.auth.user.uid));
-    const users$ = collectionData(users);    
-    const obs = users$.pipe(
-      // map((users) => users.map((user, idx) => idx)),      
-      map((users) => users.map((user) => this.getLastMessage(user['uid']).pipe(
-        switchMap((lastMessage) => of(({ ...user, lastMessage}))),
-      ))),      
-      take(1),
-      concatMap(userObj => userObj),      
-      combineLatestAll(),
-    );  
-    return obs;
+    
+    onSnapshot(users, (querySnapshot) => {
+      const usersArr = [];
+      querySnapshot.forEach((doc) => {
+        // console.log(doc.data());
+        usersArr.push(doc.data());
+      });
+      // console.log(usersArr);
+      this.chatUsers$.next(usersArr);
+    });
   }
 
+  chatUsers$ = new BehaviorSubject<any>([]); 
+  
   getUserInfo(userId: string) {
     // console.log('getting user data', userId);
     const colRef = collection(this.fs, 'users');
@@ -94,7 +105,7 @@ export class ChatService {
     let data = (await getDoc(chatRef)).data();
     let uploadData = await this.upload.uploadFile();
 
-    const lastMessage = {
+    const message = {
       message: content,
       sender: uid,
       receiver: to,
@@ -112,18 +123,29 @@ export class ChatService {
           [to]: true,
         },
         count: 1,
-        messages: [lastMessage],
+        messages: [message]
       });
 
-      await updateDoc(createdChatRef, {
-        ...data,
-        id: createdChatRef.id,
-        lastMessage,
+      await updateDoc(createdChatRef, {        
+        id: createdChatRef.id
       });
     } else {
-      data['messages'] = [...data['messages'], lastMessage];
-      data['lastMessage'] = lastMessage;
+      data['messages'] = [...data['messages'], message];
+      // data['lastMessage'] = { ...data['lastMessage'], [uid]: { message: content, timestamp: message.timestamp, file: message.file  } };
       await updateDoc(chatRef, data);
     }
+
+    await this.updateUserLastMsg({ message: content, timestamp: message.timestamp, file: message.file  });
+
+    this.upload.cancelFile();
+  }
+
+  private async updateUserLastMsg(msg: any) {
+    const { uid } = this.auth.user;
+
+    const userDocRef = doc(this.fs, `users/${uid}`);
+    await updateDoc(userDocRef, {
+      lastMessage: msg
+    })
   }
 }

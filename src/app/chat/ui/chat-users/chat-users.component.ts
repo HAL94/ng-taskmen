@@ -2,8 +2,8 @@ import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'chat-users',
-  template: `
-    <ul *ngIf="users" class="bg-white rounded-2xl">
+  template: `    
+    <ul class="bg-white rounded-2xl">
       <li
         *ngFor="let user of users"
         (click)="onClick(user)"
@@ -21,12 +21,12 @@ import { Component, Input, OnInit } from '@angular/core';
           </div>
           <div class="flex flex-col justify-center items-start ml-3 mr-auto">
             <span class="text-[#5a5a5a]">{{ user.displayName }}</span>            
-            <span *ngIf="user.lastMessage" class="text-md text-[#a9a9a9] clamp-1">{{ user.lastMessage.message }}</span>
+            <span *ngIf="user['lastMessage']" class="text-md text-[#a9a9a9] clamp-1">{{ user.lastMessage.message }}</span>
           </div>
-          <div class="flex flex-col justify-center items-center">
-            <span class="text-[#5a5a5a] text-lg mr-5"> {{lastMessageDate(user.lastMessage.timestamp)}} </span>
-            <span class="text-[#5a5a5a] text-sm mr-5"> {{lastMessageTimestamp(user.lastMessage.timestamp)}} </span>
-          </div>
+          <!-- <div class="flex flex-col justify-center items-center">
+            <span class="text-[#5a5a5a] text-lg mr-5"> {{lastMessageDate(user?.lastMessage[user.uid]?.timestamp)}} </span>
+            <span class="text-[#5a5a5a] text-sm mr-5"> {{lastMessageTimestamp(user?.lastMessage[user.uid]?.timestamp)}} </span>
+          </div> -->
         </div>
       </li>
     </ul>
@@ -57,6 +57,7 @@ export class ChatUsersComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
+    console.log('got users', this.users);
   }
   lastMessageDate(timestamp: string | number) {
     if (!timestamp) return "";

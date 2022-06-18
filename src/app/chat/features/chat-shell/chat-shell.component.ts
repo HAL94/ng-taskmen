@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
-import { combineLatest, Observable, Subscription } from 'rxjs';
+import { combineLatest, combineLatestAll, concatMap, filter, map, Observable, of, Subscription, switchMap, take, tap } from 'rxjs';
 import { AuthService } from 'src/app/shared/auth/data-access/auth.service';
 import { ChatService } from '../../data-access/chat.service';
 import { AutoScrollDirective } from '../../utils/auto-scroll/auto-scroll.directive';
@@ -9,8 +9,8 @@ import { AutoScrollDirective } from '../../utils/auto-scroll/auto-scroll.directi
   selector: 'chat-shell',
   template: `
     <div class="grid grid-cols-4">
-      <div class="flex flex-col justify-center items-center col-span-1">
-        <chat-users [users]="peers$ | async" [onClick]="startMessagingUser" class="h-full w-full px-4 pt-0"></chat-users>
+      <div class="flex flex-col justify-center items-center col-span-1" *ngIf="peers$ | async as peers">
+        <chat-users [users]="peers" [onClick]="startMessagingUser" class="h-full w-full px-4 pt-0"></chat-users>
       </div>
       <div class="flex flex-col w-full justify-center items-center col-span-3 bg-white rounded-2xl h-full" *ngIf="chatInfo$ | async as chatInfo">
         <div class="w-full border-b border-[#F7F7F7] mx-3 px-3 py-3">
@@ -59,7 +59,8 @@ export class ChatShellComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.peers$ = this.chat.getUsersList();
+    this.peers$ = this.chat.chatUsers$.asObservable();
+    this.peers$.subscribe((result) => console.log('result', result));
   }
 
   startMessagingUser(user: any) {

@@ -73,7 +73,7 @@ export class ChatFormComponent implements OnInit {
     console.log('submitting', chatTextForm.value);
     if (chatTextForm.value['message'] !== '') {
       const content = chatTextForm.value['message'];
-      this.chat.sendMessage(content, this.userId, this.chatId);
+      this.chat.sendMessage(content, this.userId, this.chatId);      
       chatTextForm.reset();      
     }
   }

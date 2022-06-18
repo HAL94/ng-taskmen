@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { ChatService } from './chat/data-access/chat.service';
 import { AuthService } from './shared/auth/data-access/auth.service';
 // .auth-area {
 //   padding: 23px;
@@ -47,12 +48,16 @@ import { AuthService } from './shared/auth/data-access/auth.service';
     }
   `],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   constructor(public auth: AuthService, private router: Router) {}
 
   signOut() {
     this.auth.signOut().subscribe({
       next: () => this.router.navigate(['login'])
     });
+  }
+
+  ngOnInit(): void {
+    
   }
 }
