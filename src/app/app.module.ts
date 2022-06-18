@@ -39,7 +39,7 @@ import { provideStorage, StorageModule } from '@angular/fire/storage'
     }),    
     provideFirebaseApp(() => {
       const app = initializeApp(environment.firebase)      
-      // connectFunctionsEmulator(getFunctions(app), 'localhost', 5001);
+      connectFunctionsEmulator(getFunctions(app), 'localhost', 5001);
       
       return app;
     }),
