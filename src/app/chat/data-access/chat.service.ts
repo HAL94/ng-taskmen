@@ -12,26 +12,12 @@ import {
 } from '@angular/fire/firestore';
 
 import {
-  combineAll,
-  combineLatest,
   combineLatestAll,
-  combineLatestWith,
-  concat,
-  concatAll,
   concatMap,
-  distinct,
-  exhaustMap,
   map,
-  merge,
-  mergeAll,
-  mergeMap,
-  mergeScan,
   of,
   switchMap,
   take,
-  tap,
-  toArray,
-  zip,
 } from 'rxjs';
 import { AuthService } from 'src/app/shared/auth/data-access/auth.service';
 import { FileUploadService } from 'src/app/shared/file-upload/data-access/file-upload.service';
