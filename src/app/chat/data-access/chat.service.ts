@@ -84,7 +84,7 @@ export class ChatService {
       // tap((chat) => console.log(chat)),
       map((chatDoc) => chatDoc['lastMessage'] || {})
     );
-    // return lastChatMessage
+    
   }
 
   async sendMessage(content: string, to: string, chatId?: string) {
