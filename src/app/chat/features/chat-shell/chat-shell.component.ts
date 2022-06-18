@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
-import { combineLatest, Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, zip } from 'rxjs';
 import { AuthService } from 'src/app/shared/auth/data-access/auth.service';
 import { ChatService } from '../../data-access/chat.service';
 import { AutoScrollDirective } from '../../utils/auto-scroll/auto-scroll.directive';
@@ -67,7 +67,7 @@ export class ChatShellComponent implements OnInit, OnDestroy {
 
     const clickedUser$ = this.chat.getUserInfo(user.uid);
 
-    this.chatInfo$ = combineLatest(chat$, clickedUser$, (chat, user) => ({
+    this.chatInfo$ = zip(chat$, clickedUser$, (chat, user) => ({
       chat,
       user,
     }));
