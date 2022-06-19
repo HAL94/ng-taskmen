@@ -1,11 +1,14 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { User } from '@angular/fire/auth';
+import { combineLatest, combineLatestAll, concatMap, filter, map, Observable, of, switchMap, take } from 'rxjs';
+import { ChatService } from '../../data-access/chat.service';
 
 @Component({
   selector: 'chat-users',
   template: `    
-    <ul class="bg-white rounded-2xl">
+    <ul class="bg-white rounded-2xl" *ngIf="usersWithLastMsgs$ | async as userObjs">
       <li
-        *ngFor="let user of users"
+        *ngFor="let user of userObjs.users; let i = index"
         (click)="onClick(user)"
         class="px-2 pt-4 pb-3 w-full cursor-pointer relative chat-peer mb-5"
       >
@@ -21,12 +24,12 @@ import { Component, Input, OnInit } from '@angular/core';
           </div>
           <div class="flex flex-col justify-center items-start ml-3 mr-auto">
             <span class="text-[#5a5a5a]">{{ user.displayName }}</span>            
-            <span *ngIf="user['lastMessage']" class="text-md text-[#a9a9a9] clamp-1">{{ user.lastMessage.message }}</span>
+            <span class="text-md text-[#a9a9a9] clamp-1">{{ userObjs.lastMsgs[i].lastMessage?.message }}</span>
           </div>
-          <!-- <div class="flex flex-col justify-center items-center">
-            <span class="text-[#5a5a5a] text-lg mr-5"> {{lastMessageDate(user?.lastMessage[user.uid]?.timestamp)}} </span>
-            <span class="text-[#5a5a5a] text-sm mr-5"> {{lastMessageTimestamp(user?.lastMessage[user.uid]?.timestamp)}} </span>
-          </div> -->
+          <div class="flex flex-col justify-center items-center" *ngIf="userObjs.lastMsgs[i].lastMessage as msg">
+            <!-- <span class="text-[#5a5a5a] text-lg mr-5"> {{lastMessageDate(msg?.timestamp)}} </span> -->
+            <span class="text-[#5a5a5a] text-sm mr-5"> {{lastMessageTimestamp(msg?.timestamp)}} </span>
+          </div>
         </div>
       </li>
     </ul>
@@ -51,14 +54,31 @@ import { Component, Input, OnInit } from '@angular/core';
   ],
 })
 export class ChatUsersComponent implements OnInit {
-  @Input() users: any[];
+  @Input() users$: Observable<any[]>;
   @Input() onClick: Function;
 
-  constructor() {}
+  usersLastMessages = [];
+
+  usersWithLastMsgs$: Observable<any>;
+
+  constructor(private chat: ChatService) {}
 
   ngOnInit(): void {
-    console.log('got users', this.users);
+    // console.log('got users', this.users$);
+    const lastMessages$ = this.users$.pipe(
+      filter((result) => result.length > 0),
+      take(1),      
+      map((users) => users.map((user: User) => this.chat.getLastMessage(user.uid).pipe(                
+        // tap((result) => console.log('anything', result)),
+        switchMap(lastMessage => of({ lastMessage: lastMessage[user.uid] ? lastMessage[user.uid] : null }))
+      ))),
+      concatMap(userObj => userObj),
+      combineLatestAll()
+    );
+
+    this.usersWithLastMsgs$ = combineLatest([lastMessages$, this.users$], (lastMsgs, users) => ({ lastMsgs, users }));
   }
+
   lastMessageDate(timestamp: string | number) {
     if (!timestamp) return "";
     const date = new Date(timestamp);    

@@ -3,10 +3,10 @@ import { CommonModule } from '@angular/common';
 import { ChatShellComponent } from './chat-shell.component';
 import { RouterModule, Routes } from '@angular/router';
 
-import { ChatUsersModule } from '../../ui/chat-users/chat-users.module';
+import { ChatUsersModule } from '../chat-users/chat-users.module';
 import { ChatFormModule } from '../chat-form/chat-form.module';
 import { ChatHeaderModule } from '../../ui/chat-header/chat-header.module';
-import { ChatAreaModule } from '../chat-area/chat-area.module';
+import { ChatAreaModule } from '../../ui/chat-area/chat-area.module';
 import { AutoScrollModule } from '../../utils/auto-scroll/auto-scroll.module';
 
 const routes: Routes = [

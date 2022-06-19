@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { User } from '@angular/fire/auth';
 import {
   Firestore,
   doc,
@@ -57,7 +58,21 @@ export class ChatService {
     });
   }
 
-  chatUsers$ = new BehaviorSubject<any>([]); 
+  chatUsers$ = new BehaviorSubject<any>([]);
+  
+  get chatUsers() {
+    return this.chatUsers$.asObservable().pipe(
+      filter((result) => result.length > 0),
+      take(1),      
+      tap((result) => console.log(result)),
+      map((users) => users.map((user: User) => this.getLastMessage(user.uid).pipe(                
+        // tap((result) => console.log('anything', result)),
+        switchMap(lastMessage => of({ ...user, lastMessage: lastMessage[user.uid] ? lastMessage[user.uid] : null }))
+      ))),
+      concatMap(userObj => userObj),
+      combineLatestAll()
+    );
+  }
   
   getUserInfo(userId: string) {
     // console.log('getting user data', userId);
@@ -81,7 +96,11 @@ export class ChatService {
   }
 
   getLastMessage(fromUid: string) {
+    if (!this.auth || !fromUid) {
+      return of(null);
+    }
     const { uid: toUid } = this.auth.user;
+    // console.log('getting users message', fromUid);
     // console.log('that user', fromUid, 'this user', toUid);
     const colRef = collection(this.fs, 'chats');
     const lastChatMessage = query(
@@ -91,8 +110,10 @@ export class ChatService {
     );
 
     return collectionData(lastChatMessage).pipe(
+      // tap((chat) => console.log('got chat', chat)),
       map((chatArr) => (chatArr[0] ? chatArr[0] : {})),
-      // tap((chat) => console.log(chat)),
+      // tap((chat) => console.log('got chat', chat)),
+      // filter((chat) => !!chat),      
       map((chatDoc) => chatDoc['lastMessage'] || {})
     );
     
@@ -123,7 +144,8 @@ export class ChatService {
           [to]: true,
         },
         count: 1,
-        messages: [message]
+        messages: [message],
+        lastMessage: {[uid]: { message: content, timestamp: message.timestamp, file: message.file  }}
       });
 
       await updateDoc(createdChatRef, {        
@@ -131,11 +153,11 @@ export class ChatService {
       });
     } else {
       data['messages'] = [...data['messages'], message];
-      // data['lastMessage'] = { ...data['lastMessage'], [uid]: { message: content, timestamp: message.timestamp, file: message.file  } };
+      data['lastMessage'] = { ...data['lastMessage'], [uid]: { message: content, timestamp: message.timestamp, file: message.file  } };
       await updateDoc(chatRef, data);
     }
 
-    await this.updateUserLastMsg({ message: content, timestamp: message.timestamp, file: message.file  });
+    // await this.updateUserLastMsg({ message: content, timestamp: message.timestamp, file: message.file  });
 
     this.upload.cancelFile();
   }
