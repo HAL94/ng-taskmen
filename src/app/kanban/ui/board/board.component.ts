@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { KanbanService } from '../../data-access/kanban.service';
 import { Board, Task } from '../../utils/board.model';
 
 @Component({
@@ -14,13 +15,19 @@ import { Board, Task } from '../../utils/board.model';
       </div>
       <div class="flex flex-col w-full mt-3">
         <div *ngFor="let task of board.tasks; let idx = index;" class="my-1">
-          <div (click)="openDialog('edit', idx)" class="p-4 cursor-pointer rounded" [ngClass]="task.label">{{task.description}}</div>
+          <div class="w-full group p-4 cursor-pointer rounded flex flex-row items-center justify-between" [ngClass]="task.label">
+            <span>{{task.description}}</span>
+            <div class="flex flex-row items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-in">
+              <mat-icon (click)="onDeleteTask(board, idx)">remove</mat-icon>
+              <mat-icon (click)="onEditTask(board, idx)">edit</mat-icon>
+            </div>
+          </div>
         </div>
         <div class="flex flex-row flex-wrap items-start justify-start my-4">
-          <button mat-stroked-button (click)="openDialog('add')" class="mr-3">
+          <button mat-stroked-button (click)="onAddTask(board)" class="mr-3">
             <mat-icon>add</mat-icon>
           </button>
-          <button mat-button color="warn">
+          <button mat-button color="warn" (click)="onDeleteBoard(board)">
             <mat-icon>delete</mat-icon>
           </button>
         </div>
@@ -42,18 +49,13 @@ export class BoardComponent implements OnInit {
   @Input() board: Board;
   @Input() onAddTask: Function;
   @Input() onEditTask: Function;
+  @Input() onDeleteTask: Function;
+  @Input() onDeleteBoard: Function;
 
-  constructor() { }
+
+  constructor(public kanban: KanbanService) { }
 
   ngOnInit(): void {
   }
   
-  openDialog(mode: string, taskIdx?: number) {
-    if (mode === 'add') {
-      this.onAddTask(this.board);
-    }
-    else if (mode === 'edit') {
-      this.onEditTask(this.board, taskIdx);
-    }
-  }
 }

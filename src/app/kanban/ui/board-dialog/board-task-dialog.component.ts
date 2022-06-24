@@ -17,7 +17,7 @@ import { Board, Task } from '../../utils/board.model';
         </mat-button-toggle>
       </mat-button-toggle-group>
 
-      <button mat-stroked-button (click)="onCreate()" [disabled]="description === null || description === ''">
+      <button mat-stroked-button (click)="onCreateOrUpdate()" [disabled]="description === null || description === ''">
         {{ taskIdx ? 'Update Task' : 'Add Task' }}
       </button>
     </div>
@@ -45,11 +45,11 @@ export class BoardTaskDialogComponent implements OnInit {
     }
   }
 
-  onCreate() {
+  onCreateOrUpdate() {
     const newTask: Task = {
       description: this.description,
       label: this.label
     }
-    this.formCb(this.board, newTask);
+    this.formCb(newTask);
   }
 }

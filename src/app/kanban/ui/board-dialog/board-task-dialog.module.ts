@@ -6,12 +6,16 @@ import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
+import { BoardDeleteConfirmDialogComponent } from './board-delete-confirm-dialog.component';
+import { AddBoardDialogComponent } from './add-board-dialog.component';
 
 
 
 @NgModule({
   declarations: [
-    BoardTaskDialogComponent
+    BoardTaskDialogComponent,
+    BoardDeleteConfirmDialogComponent,
+    AddBoardDialogComponent
   ],
   imports: [
     CommonModule,
@@ -21,6 +25,8 @@ import { MatIconModule } from '@angular/material/icon';
     MatIconModule,
     FormsModule,
   ],
-  exports: [BoardTaskDialogComponent]
+  exports: [BoardTaskDialogComponent, 
+    BoardDeleteConfirmDialogComponent,
+    AddBoardDialogComponent]
 })
 export class BoardTaskDialogModule { }

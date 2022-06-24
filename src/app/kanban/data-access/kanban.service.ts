@@ -1,5 +1,5 @@
 import { ComponentFactoryResolver, Injectable } from '@angular/core';
-import { collectionData, doc, Firestore, orderBy, query, updateDoc, where } from '@angular/fire/firestore';
+import { addDoc, collectionData, deleteDoc, doc, Firestore, orderBy, query, updateDoc, where } from '@angular/fire/firestore';
 import { collection } from '@firebase/firestore';
 import { map, Observable, take, tap } from 'rxjs';
 import { AuthService } from 'src/app/shared/auth/data-access/auth.service';
@@ -14,12 +14,18 @@ export class KanbanService {
    * Creates a new board for the current user
    */
   async createBoard(data: Board) {
-    // const user = await this.afAuth.currentUser;
-    // return this.db.collection('boards').add({
-    //   ...data,
-    //   uid: user.uid,
-    //   tasks: [{ description: 'Hello!', label: 'yellow' }]
-    // });
+    const boardRef = collection(this.fs, 'boards');
+    const { uid } = this.auth.user;
+
+    const boardDocRef = await addDoc(boardRef, {
+      ...data,
+      tasks: [],
+      uid
+    });
+
+    await updateDoc(boardDocRef, {
+      id: boardDocRef.id
+    });
   }
 
   /**
@@ -49,7 +55,9 @@ export class KanbanService {
   /**
    * Delete board
    */
-   deleteBoard(boardId: string) {
+   async deleteBoard(boardId: string) {
+    const boardRef = doc(this.fs, `boards/${boardId}`);
+    await deleteDoc(boardRef);
     // return this.db
     //   .collection('boards')
     //   .doc(boardId)
@@ -63,21 +71,6 @@ export class KanbanService {
     console.log('updating');
     const boardRef = doc(this.fs, `boards/${boardId}`);
     await updateDoc(boardRef, { tasks });
-    // return this.db
-    //   .collection('boards')
-    //   .doc(boardId)
-    //   .update({ tasks });
   }
 
-  /**
-   * Remove a specifc task from the board
-   */
-   removeTask(boardId: string, task: Task) {
-    // return this.db
-    //   .collection('boards')
-    //   .doc(boardId)
-    //   .update({
-    //     tasks: firebase.firestore.FieldValue.arrayRemove(task)
-    //   });
-  }
 }
