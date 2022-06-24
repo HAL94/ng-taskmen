@@ -15,12 +15,12 @@ import { provideFirestore, getFirestore, connectFirestoreEmulator, enableIndexed
 import { connectFunctionsEmulator, Functions, FunctionsInstances, getFunctions, provideFunctions } from '@angular/fire/functions';
 import { PickerModule } from '@ctrl/ngx-emoji-mart';
 import { getStorage, connectStorageEmulator } from "firebase/storage";
-import { provideStorage, StorageModule } from '@angular/fire/storage'
+import { provideStorage, StorageModule } from '@angular/fire/storage';
 
 
 @NgModule({
   declarations: [
-    AppComponent,    
+    AppComponent,  
   ],
   imports: [
     BrowserModule,

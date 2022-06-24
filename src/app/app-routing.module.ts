@@ -12,8 +12,11 @@ const routes: Routes = [
 
   { path: 'chat', ...canActivate(() => redirectUnauthorizedTo(['login'])),
    loadChildren: () => import('./chat/features/chat-shell/chat-shell.module').then(m => m.ChatShellModule)},
+  
+   { path: 'board', ...canActivate(() => redirectUnauthorizedTo(['login'])),
+   loadChildren: () => import('./kanban/features/board-shell/board-shell.module').then(m => m.BoardShellModule)},
 
-  { path: '', pathMatch: 'full', redirectTo: 'chat'}
+  { path: '', pathMatch: 'full', redirectTo: 'board'}
 ];
 
 @NgModule({

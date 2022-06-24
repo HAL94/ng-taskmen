@@ -10,26 +10,19 @@ import {
   collectionData,
   query,
   where,
-  collectionSnapshots,
   onSnapshot,
-  collectionChanges,
 } from '@angular/fire/firestore';
 
 import {
-  BehaviorSubject,
-  combineLatest,
+  BehaviorSubject,  
   combineLatestAll,
   concatMap,
-  exhaustMap,
   filter,
   map,
-  mergeAll,
-  mergeMap,
   of,
   switchMap,
   take,
   tap,
-  toArray,
 } from 'rxjs';
 import { AuthService } from 'src/app/shared/auth/data-access/auth.service';
 import { FileUploadService } from 'src/app/shared/file-upload/data-access/file-upload.service';
@@ -64,7 +57,7 @@ export class ChatService {
     return this.chatUsers$.asObservable().pipe(
       filter((result) => result.length > 0),
       take(1),      
-      tap((result) => console.log(result)),
+      // tap((result) => console.log(result)),
       map((users) => users.map((user: User) => this.getLastMessage(user.uid).pipe(                
         // tap((result) => console.log('anything', result)),
         switchMap(lastMessage => of({ ...user, lastMessage: lastMessage[user.uid] ? lastMessage[user.uid] : null }))
