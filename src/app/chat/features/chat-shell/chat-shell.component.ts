@@ -57,7 +57,6 @@ export class ChatShellComponent implements OnInit, OnDestroy {
       this.subChat.unsubscribe();
     }
   }
-
   ngOnInit(): void {
     this.peers$ = this.chat.chatUsers$.asObservable();
   }

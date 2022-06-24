@@ -46,7 +46,7 @@ import { ChatService } from '../../data-access/chat.service';
           aria-label="Send Message"
           type="submit"
           [disabled]="chatTextForm.invalid"
-          class="disabled:cursor-not-allowed"
+          class="disabled:cursor-not-allowed disabled:opacity-60"
         >
           <mat-icon class="text-[#8b8e95]">send</mat-icon>
         </button>
@@ -70,7 +70,7 @@ export class ChatFormComponent implements OnInit {
   }
 
   onSendMessage(chatTextForm: NgForm) {
-    console.log('submitting', chatTextForm.value);
+    // console.log('submitting', chatTextForm.value);
     if (chatTextForm.value['message'] !== '') {
       const content = chatTextForm.value['message'];
       this.chat.sendMessage(content, this.userId, this.chatId);      

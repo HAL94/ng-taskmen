@@ -26,7 +26,7 @@ import { ChatService } from '../../data-access/chat.service';
             <span class="text-[#5a5a5a]">{{ user.displayName }}</span>            
             <span class="text-md text-[#a9a9a9] clamp-1">{{ userObjs.lastMsgs[i].lastMessage?.message }}</span>
           </div>
-          <div class="flex flex-col justify-center items-center" *ngIf="userObjs.lastMsgs[i].lastMessage as msg">
+          <div class="flex flex-col justify-center items-center" *ngIf="userObjs?.lastMsgs[i]?.lastMessage as msg">
             <!-- <span class="text-[#5a5a5a] text-lg mr-5"> {{lastMessageDate(msg?.timestamp)}} </span> -->
             <span class="text-[#5a5a5a] text-sm mr-5"> {{lastMessageTimestamp(msg?.timestamp)}} </span>
           </div>
@@ -56,8 +56,6 @@ import { ChatService } from '../../data-access/chat.service';
 export class ChatUsersComponent implements OnInit {
   @Input() users$: Observable<any[]>;
   @Input() onClick: Function;
-
-  usersLastMessages = [];
 
   usersWithLastMsgs$: Observable<any>;
 

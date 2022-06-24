@@ -1,21 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ChatService } from './chat/data-access/chat.service';
 import { AuthService } from './shared/auth/data-access/auth.service';
-// .auth-area {
-//   padding: 23px;
-//   background: white;
-//   border-radius: 10px;
-// }
 
-// .auth-area-content {
-//   padding: 15px 0;
-//   box-sizing: border-box;
-// }
-
-// .heading {
-//   margin-bottom: 15px;
-// }
 @Component({
   selector: 'app-root',
   template: `

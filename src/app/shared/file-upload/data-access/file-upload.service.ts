@@ -39,7 +39,7 @@ export class FileUploadService {
         size: file.size,
       });
       this.file = file;
-      console.log(result);
+      // console.log(result);
     };
   }
 

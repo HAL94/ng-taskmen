@@ -135,7 +135,7 @@ export class ChatService {
     };
     if (!data) {
       const chatsRef = collection(this.fs, 'chats');
-      console.log(chatsRef, content, `to: ${to}`, `from: ${uid}`);
+      // console.log(chatsRef, content, `to: ${to}`, `from: ${uid}`);
 
       const createdChatRef = await addDoc(chatsRef, {
         createdAt: Date.now(),
@@ -157,17 +157,7 @@ export class ChatService {
       await updateDoc(chatRef, data);
     }
 
-    // await this.updateUserLastMsg({ message: content, timestamp: message.timestamp, file: message.file  });
-
     this.upload.cancelFile();
   }
 
-  private async updateUserLastMsg(msg: any) {
-    const { uid } = this.auth.user;
-
-    const userDocRef = doc(this.fs, `users/${uid}`);
-    await updateDoc(userDocRef, {
-      lastMessage: msg
-    })
-  }
 }

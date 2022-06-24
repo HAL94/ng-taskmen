@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FileUploadService } from '../data-access/file-upload.service';
 
 @Component({
   selector: 'app-file-upload',
   template: `
     <div>
-      <input type="file" (change)="onFileChange($event)" accept="file" [multiple]="false" [hidden]="true" id="file_upload_input"/>
+      <input type="file" #fileInput (change)="onFileChange($event)" accept="file" [multiple]="false" [hidden]="true" id="file_upload_input"/>
       <button mat-icon-button aria-label="Upload File" type="button" (click)="onUploadClick()">
         <mat-icon class="text-[#8b8e95]">upload</mat-icon>
       </button>
@@ -14,23 +14,21 @@ import { FileUploadService } from '../data-access/file-upload.service';
   styles: [
   ]
 })
-export class FileUploadComponent implements OnInit {
+export class FileUploadComponent {
+  @ViewChild('fileInput') fileInput: ElementRef;
+
   constructor(private upload: FileUploadService) { }
 
-  ngOnInit(): void {
-  }
-  onFileChange($event) {
-    console.log('file event', $event);
+  onFileChange($event: any) {
+    // console.log('file event', $event);
     const file = $event.target.files[0];
-    console.log('path', file);
+    // console.log('path', file);
     this.upload.selectFile(file);
   }
   
   
   onUploadClick() {
-    const fileUploadElement = document.getElementById('file_upload_input');
-    fileUploadElement.click();
-    console.log('attempting to upload here?');
+    this.fileInput.nativeElement.click();    
   }
 
 }
