@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, ViewChild } from '@angular/core';
 
 import { combineLatest, Observable, Subscription } from 'rxjs';
 import { AuthService } from 'src/app/shared/auth/data-access/auth.service';
@@ -10,7 +10,7 @@ import { AutoScrollDirective } from '../../utils/auto-scroll/auto-scroll.directi
   template: `
     <div class="grid grid-cols-4">
       <div class="flex flex-col justify-center items-center col-span-1">
-        <chat-users [users$]="peers$" [onClick]="startMessagingUser" class="h-full w-full px-4 pt-0"></chat-users>
+        <chat-users [onClick]="startMessagingUser" class="h-full w-full px-4 pt-0"></chat-users>
       </div>
       <div class="flex flex-col w-full justify-center items-center col-span-3 bg-white rounded-2xl h-full" *ngIf="chatInfo$ | async as chatInfo">
         <div class="w-full border-b border-[#F7F7F7] mx-3 px-3 py-3">
@@ -30,22 +30,13 @@ import { AutoScrollDirective } from '../../utils/auto-scroll/auto-scroll.directi
     `,
   ],
 })
-export class ChatShellComponent implements OnInit, OnDestroy {
-  peers$: Observable<any>;
+export class ChatShellComponent implements OnDestroy {  
   chatInfo$: Observable<any>;
   subChat: Subscription;
   @ViewChild(AutoScrollDirective) scrollDirRef: AutoScrollDirective;
 
   constructor(public auth: AuthService, public chat: ChatService) {
     this.startMessagingUser = this.startMessagingUser.bind(this);
-  }
-  ngOnDestroy(): void {
-    if (this.subChat) {
-      this.subChat.unsubscribe();
-    }
-  }
-  ngOnInit(): void {
-    this.peers$ = this.chat.chatUsers$.asObservable();
   }
 
   startMessagingUser(user: any) {
@@ -67,6 +58,12 @@ export class ChatShellComponent implements OnInit, OnDestroy {
     })
     
     // this.chatInfo$.subscribe(console.log);
+  }
+
+  ngOnDestroy(): void {
+    if (this.subChat) {
+      this.subChat.unsubscribe();
+    }
   }
 
 }

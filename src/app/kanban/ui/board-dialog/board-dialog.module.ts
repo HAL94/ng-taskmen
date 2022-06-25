@@ -29,4 +29,4 @@ import { AddBoardDialogComponent } from './add-board-dialog.component';
     BoardDeleteConfirmDialogComponent,
     AddBoardDialogComponent]
 })
-export class BoardTaskDialogModule { }
+export class BoardDialogModule { }

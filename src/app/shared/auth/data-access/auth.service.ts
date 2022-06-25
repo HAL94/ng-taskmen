@@ -1,9 +1,9 @@
 
 import { Injectable } from '@angular/core';
 import { Auth, authState, createUserWithEmailAndPassword, signInWithEmailAndPassword } from '@angular/fire/auth';
-import { Firestore, doc, DocumentReference, docSnapshots, setDoc}from '@angular/fire/firestore';
+import { Firestore, doc, DocumentReference, setDoc}from '@angular/fire/firestore';
 import { updateProfile } from '@firebase/auth';
-import { forkJoin, from, map, Observable, of, switchMap, tap } from 'rxjs';
+import { forkJoin, from, switchMap, tap } from 'rxjs';
 import { SigninCredentials, SignupCredentials } from '../utils/auth.model';
 import { AvatarGenerator } from 'random-avatar-generator';
 import { updateDoc } from '@firebase/firestore';

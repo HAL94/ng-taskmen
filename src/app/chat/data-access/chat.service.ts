@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { User } from '@angular/fire/auth';
+import { User } from '../../shared/models/user';
+
 import {
   Firestore,
   doc,
@@ -19,13 +20,14 @@ import {
   concatMap,
   filter,
   map,
+  Observable,
   of,
   switchMap,
   take,
-  tap,
 } from 'rxjs';
 import { AuthService } from 'src/app/shared/auth/data-access/auth.service';
 import { FileUploadService } from 'src/app/shared/file-upload/data-access/file-upload.service';
+import { Chat, LastMessage } from '../utils/models';
 
 @Injectable({
   providedIn: 'root',
@@ -44,37 +46,23 @@ export class ChatService {
       const usersArr = [];
       querySnapshot.forEach((doc) => {
         // console.log(doc.data());
-        usersArr.push(doc.data());
+        usersArr.push(doc.data() as User);
       });
       // console.log(usersArr);
       this.chatUsers$.next(usersArr);
     });
   }
 
-  chatUsers$ = new BehaviorSubject<any>([]);
+  chatUsers$ = new BehaviorSubject<User[]>([]);  
   
-  get chatUsers() {
-    return this.chatUsers$.asObservable().pipe(
-      filter((result) => result.length > 0),
-      take(1),      
-      // tap((result) => console.log(result)),
-      map((users) => users.map((user: User) => this.getLastMessage(user.uid).pipe(                
-        // tap((result) => console.log('anything', result)),
-        switchMap(lastMessage => of({ ...user, lastMessage: lastMessage[user.uid] ? lastMessage[user.uid] : null }))
-      ))),
-      concatMap(userObj => userObj),
-      combineLatestAll()
-    );
-  }
-  
-  getUserInfo(userId: string) {
+  getUserInfo(userId: string): Observable<User> {
     // console.log('getting user data', userId);
     const colRef = collection(this.fs, 'users');
     const userDoc = query(colRef, where('uid', '==', userId));
-    return collectionData(userDoc).pipe(map((data) => data[0]));
+    return collectionData(userDoc).pipe(map((data) => data[0] as User));
   }
 
-  getChat(toUid: string) {
+  getChat(toUid: string): Observable<Chat | {} | Partial<Chat>> {
     const { uid } = this.auth.user;
     const colRef = collection(this.fs, 'chats');
     const userInitiatedChats = query(
@@ -84,11 +72,11 @@ export class ChatService {
     );
     return collectionData(userInitiatedChats).pipe(
       // tap((chats) => console.log('fetched something', chats)),
-      map((chatArr) => (chatArr[0] ? chatArr[0] : {}))
+      map((chatArr) => (chatArr[0] ? chatArr[0] as Chat : {}))
     );
   }
 
-  getLastMessage(fromUid: string) {
+  getLastMessage(fromUid: string): Observable<LastMessage | {} | Partial<LastMessage>> {
     if (!this.auth || !fromUid) {
       return of(null);
     }
@@ -107,12 +95,12 @@ export class ChatService {
       map((chatArr) => (chatArr[0] ? chatArr[0] : {})),
       // tap((chat) => console.log('got chat', chat)),
       // filter((chat) => !!chat),      
-      map((chatDoc) => chatDoc['lastMessage'] || {})
+      map((chatDoc) => chatDoc['lastMessage'] as LastMessage || {})
     );
     
   }
 
-  async sendMessage(content: string, to: string, chatId?: string) {
+  async sendMessage(content: string, to: string, chatId?: string): Promise<void> {
     const { uid } = this.auth.user;
     const chatRef = doc(this.fs, `chats/${chatId}`);
 

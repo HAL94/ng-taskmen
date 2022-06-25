@@ -6,7 +6,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 
 import { MatButtonModule } from '@angular/material/button';
 import { DialogModule } from 'src/app/shared/dialog/dialog.module';
-import { BoardTaskDialogModule } from '../../ui/board-dialog/board-task-dialog.module';
+import { BoardDialogModule } from '../../ui/board-dialog/board-dialog.module';
 
 
 
@@ -20,7 +20,7 @@ import { BoardTaskDialogModule } from '../../ui/board-dialog/board-task-dialog.m
     DragDropModule,
     MatButtonModule,
     DialogModule,
-    BoardTaskDialogModule
+    BoardDialogModule
   ],
   exports: [BoardsListComponent]
 })

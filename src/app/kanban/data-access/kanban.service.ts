@@ -1,7 +1,7 @@
-import { ComponentFactoryResolver, Injectable } from '@angular/core';
-import { addDoc, collectionData, deleteDoc, doc, Firestore, orderBy, query, updateDoc, where } from '@angular/fire/firestore';
+import { Injectable } from '@angular/core';
+import { addDoc, collectionData, deleteDoc, doc, Firestore, getDoc, orderBy, query, runTransaction, updateDoc, where, writeBatch } from '@angular/fire/firestore';
 import { collection } from '@firebase/firestore';
-import { map, Observable, take, tap } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { AuthService } from 'src/app/shared/auth/data-access/auth.service';
 import { Board, Task } from '../utils/board.model';
 
@@ -44,7 +44,11 @@ export class KanbanService {
   /**
    * Run a batch write to change the priority of each board for sorting
    */
-   sortBoards(boards: Board[]) {
+   async sortBoards(boards: Board[]) {
+    const batch = writeBatch(this.fs);
+    const refs = boards.map(b => doc(this.fs, `boards/${b.id}`));
+    refs.forEach((ref, idx) => batch.update(ref, { priority: idx }));
+    await batch.commit();
     // const db = firebase.firestore();
     // const batch = db.batch();
     // const refs = boards.map(b => db.collection('boards').doc(b.id));
@@ -58,14 +62,10 @@ export class KanbanService {
    async deleteBoard(boardId: string) {
     const boardRef = doc(this.fs, `boards/${boardId}`);
     await deleteDoc(boardRef);
-    // return this.db
-    //   .collection('boards')
-    //   .doc(boardId)
-    //   .delete();
   }
 
   /**
-   * Updates the tasks on board
+   * Updates the tasks on board, includes editing and deleting
    */
    async updateTasks(boardId: string, tasks: Task[]) {
     console.log('updating');

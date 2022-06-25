@@ -5,6 +5,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .modal-config {
+    @apply lg:w-[50vw] lg:h-auto w-full !max-w-full h-full
+  }
+}
+
 .scrollbar-thin {
   scrollbar-width: thin;
 }
@@ -23,6 +29,7 @@
 html,
 body {
   height: 100%;
+  scrollbar-width: thin;
 }
 body {
   margin: 0;

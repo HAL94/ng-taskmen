@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { User } from '@angular/fire/auth';
+import { User } from '../../../shared/models/user';
+
 import { combineLatest, combineLatestAll, concatMap, filter, map, Observable, of, switchMap, take } from 'rxjs';
 import { ChatService } from '../../data-access/chat.service';
 
@@ -7,19 +8,10 @@ import { ChatService } from '../../data-access/chat.service';
   selector: 'chat-users',
   template: `    
     <ul class="bg-white rounded-2xl" *ngIf="usersWithLastMsgs$ | async as userObjs">
-      <li
-        *ngFor="let user of userObjs.users; let i = index"
-        (click)="onClick(user)"
-        class="px-2 pt-4 pb-3 w-full cursor-pointer relative chat-peer mb-5"
-      >
+      <li *ngFor="let user of userObjs.users; let i = index" (click)="onClick(user)" class="px-2 pt-4 pb-3 w-full cursor-pointer relative chat-peer mb-5">
         <div class="flex flex-row justify-start items-center relative">
           <div class="relative">
-            <img
-              [src]="user.photoURL"
-              [alt]="user.displayName"
-              width="50"
-              height="50"
-            />
+            <img [src]="user.photoURL" [alt]="user.displayName" width="50" height="50"/>
             <div class="w-3 h-3 rounded-full absolute right-1 bottom-0" [ngClass]="{'bg-[#34eb52]' : user.isOnline, 'bg-[#eb4034]': !user.isOnline }"></div>
           </div>
           <div class="flex flex-col justify-center items-start ml-3 mr-auto">
@@ -54,7 +46,6 @@ import { ChatService } from '../../data-access/chat.service';
   ],
 })
 export class ChatUsersComponent implements OnInit {
-  @Input() users$: Observable<any[]>;
   @Input() onClick: Function;
 
   usersWithLastMsgs$: Observable<any>;
@@ -63,7 +54,8 @@ export class ChatUsersComponent implements OnInit {
 
   ngOnInit(): void {
     // console.log('got users', this.users$);
-    const lastMessages$ = this.users$.pipe(
+    const users$ = this.chat.chatUsers$.asObservable();
+    const lastMessages$ = users$.pipe(
       filter((result) => result.length > 0),
       take(1),      
       map((users) => users.map((user: User) => this.chat.getLastMessage(user.uid).pipe(                
@@ -74,7 +66,7 @@ export class ChatUsersComponent implements OnInit {
       combineLatestAll()
     );
 
-    this.usersWithLastMsgs$ = combineLatest([lastMessages$, this.users$], (lastMsgs, users) => ({ lastMsgs, users }));
+    this.usersWithLastMsgs$ = combineLatest([lastMessages$, users$], (lastMsgs, users) => ({ lastMsgs, users }));
   }
 
   lastMessageDate(timestamp: string | number) {

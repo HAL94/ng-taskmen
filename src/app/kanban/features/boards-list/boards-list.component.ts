@@ -1,5 +1,6 @@
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { DialogData } from 'src/app/shared/dialog/dialog-data.interface';
+import { DialogData, DialogOptions } from 'src/app/shared/dialog/dialog-data.interface';
 import { DialogService } from 'src/app/shared/dialog/dialog.service';
 import { KanbanService } from '../../data-access/kanban.service';
 import { Board, Task } from '../../utils/board.model';
@@ -7,14 +8,26 @@ import { Board, Task } from '../../utils/board.model';
 @Component({
   selector: 'app-boards-list',
   template: `  
-    <div class="grid gap-3 grid-flow-col auto-cols-min w-auto p-3 mx-3 my-2 overflow-auto h-full scrollbar-thin">
-      <app-board [onDeleteBoard]="openDeleteBoardDialog" [onDeleteTask]="openDeleteTaskDialog" [onEditTask]="openEditTaskDialog" [onAddTask]="openAddTaskDialog" class="max-w-[300px] mx-3" *ngFor="let board of boards; let i = index;" [board]="board"></app-board>
+    <div cdkDropList cdkDropListOrientation="horizontal"
+      (cdkDropListDropped)="drop($event)" 
+      class="grid gap-3 grid-flow-col auto-cols-min w-auto p-3 overflow-x-auto h-full scrollbar-thin">
+      
+      <app-board cdkDrag [onDeleteBoard]="openDeleteBoardDialog" 
+        [onDeleteTask]="openDeleteTaskDialog" 
+        [onEditTask]="openEditTaskDialog" 
+        [onAddTask]="openAddTaskDialog" 
+        class="max-w-[300px] mx-3" 
+        *ngFor="let board of boards; let i = index;" [board]="board">
+      </app-board>
+
       <div class="flex flex-col h-[350px] justify-center items-center border-dashed border-4 border-gray-500 p-8">
         <button mat-raised-button color="accent" cdkDragDisabled (click)="openAddBoardDialog()">
           New Board
         </button>
       </div>
+
     </div>
+
     <ng-template let-board="board" let-formCb="formCb" #addTaskTemplate>
       <app-board-task-dialog [board]="board" [formCb]="formCb"></app-board-task-dialog>
     </ng-template>
@@ -32,6 +45,24 @@ import { Board, Task } from '../../utils/board.model';
     </ng-template>
   `,
   styles: [
+    `
+      .cdk-drag-placeholder {
+        opacity: 0.2;
+        width: 350px;
+        border: 5px dashed gray;
+        margin: 0 10px;
+        
+      }
+
+      .boards.cdk-drop-list-dragging .cdk-drag {
+        transition: transform 300ms ease;
+      }
+
+
+      .cdk-drag-animating {
+        transition: transform 300ms ease;
+      }
+    `
   ]
 })
 export class BoardsListComponent implements OnInit {
@@ -42,7 +73,7 @@ export class BoardsListComponent implements OnInit {
   @ViewChild('deleteBoardTemplate') deleteBoardTemplate: TemplateRef<any>;
   @ViewChild('createBoardTemplate') createBoardTemplate: TemplateRef<any>;
 
-  private DIALGUE_OPTIONS = { width: '50vw', disableClose: false };
+  private DIALGUE_OPTIONS: DialogOptions = { panelClass: 'modal-config', disableClose: false };
 
   constructor(private kanban: KanbanService, private dialog: DialogService) {
     this.openAddTaskDialog = this.openAddTaskDialog.bind(this);
@@ -133,5 +164,10 @@ export class BoardsListComponent implements OnInit {
     };
 
     this.dialog.openDialog(dialogAddBoardData, this.DIALGUE_OPTIONS);
+  }
+
+  drop(event: CdkDragDrop<string[]>) {
+    moveItemInArray(this.boards, event.previousIndex, event.currentIndex);
+    this.kanban.sortBoards(this.boards);
   }
 }

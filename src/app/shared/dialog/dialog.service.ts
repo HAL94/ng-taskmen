@@ -20,7 +20,7 @@ export class DialogService {
 
   openDialog(dialogData: DialogData, dialogOptions?: DialogOptions) {    
     this.dialogRef = this.dialog.open(DialogComponent, {
-      data: dialogData,
+      data: dialogData,      
       ...dialogOptions
     });
     this.clearComponentOnClose();

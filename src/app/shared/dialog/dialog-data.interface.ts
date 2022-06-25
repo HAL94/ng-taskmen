@@ -7,6 +7,7 @@ export interface DialogData {
 }
 
 export interface DialogOptions {
-    width: string;
-    disableClose: boolean;
+    width?: string;
+    disableClose?: boolean;
+    panelClass?: string;
 }

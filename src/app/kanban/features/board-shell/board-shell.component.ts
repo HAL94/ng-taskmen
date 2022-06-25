@@ -13,11 +13,12 @@ import { Board } from '../../utils/board.model';
   styles: [
     `
       .board-main {
-        height: calc(100vh - 122px);
+        height: 100%;
       }
 
       :host app-boards-list {
         height: 100%;
+        display: block;
       }
     `
   ]

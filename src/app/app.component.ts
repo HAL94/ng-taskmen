@@ -15,7 +15,9 @@ import { AuthService } from './shared/auth/data-access/auth.service';
     </mat-toolbar>
 
     <main class="content bg-main-bg">
+      
       <router-outlet></router-outlet>
+      
     </main>
 
     <ng-template #authButtons>
@@ -26,11 +28,17 @@ import { AuthService } from './shared/auth/data-access/auth.service';
   styles: [`
     .content {
       min-height: calc(100vh - 64px);
-      padding: 25px 15px;
+      height: calc(100vh - 64px);
+      /* padding: 25px 15px; */
       box-sizing: border-box;
     }
     .active {
       border: 1px solid white;
+    }
+
+    :host ::ng-deep app-board-shell {
+      height: 100%;
+      display: block;
     }
   `],
 })
