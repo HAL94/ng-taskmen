@@ -1,22 +1,23 @@
+import { environment } from 'src/environments/environment';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { DialogModule } from './shared/dialog/dialog.module';
-import { IconsModule } from './shared/icons/icons.module';
+
 import { getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { provideAuth, getAuth, connectAuthEmulator } from '@angular/fire/auth';
-import materialImports from './material.imports';
-import { environment } from 'src/environments/environment';
-import { HttpClientModule } from '@angular/common/http';
 import { provideFirestore, getFirestore, connectFirestoreEmulator, enableIndexedDbPersistence } from '@angular/fire/firestore';
-import { connectFunctionsEmulator, Functions, FunctionsInstances, getFunctions, provideFunctions } from '@angular/fire/functions';
-import { PickerModule } from '@ctrl/ngx-emoji-mart';
+import { connectFunctionsEmulator, getFunctions, provideFunctions } from '@angular/fire/functions';
 import { getStorage, connectStorageEmulator } from "firebase/storage";
 import { provideStorage, StorageModule } from '@angular/fire/storage';
 
+import { HttpClientModule } from '@angular/common/http';
+
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatToolbarModule } from '@angular/material/toolbar'
+import { DialogModule } from './shared/dialog/dialog.module';
 
 @NgModule({
   declarations: [
@@ -24,13 +25,11 @@ import { provideStorage, StorageModule } from '@angular/fire/storage';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule,
-    DialogModule,
+    AppRoutingModule,    
     BrowserAnimationsModule,
-    IconsModule,
-    PickerModule,
     HttpClientModule,
     StorageModule,
+    DialogModule,
     provideFunctions(() => {      
       const app = getApp();
       const functions = getFunctions(app)
@@ -60,7 +59,8 @@ import { provideStorage, StorageModule } from '@angular/fire/storage';
       connectStorageEmulator(storage, "localhost", 9199);
       return storage;
     }),        
-    ...materialImports
+    MatSnackBarModule,
+    MatToolbarModule
   ],
   providers: [],
   bootstrap: [AppComponent],

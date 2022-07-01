@@ -55,11 +55,9 @@ export class AuthService {
   }
 
   signOut() {
-    const user = this.user;    
-    return from(this.auth.signOut()).pipe(
-      tap(async () => {
-        await updateDoc(doc(this.firestore, `users/${user.uid}`), { isOnline: false })
-      })
-    );
+    const user = this.user;
+    return from(updateDoc(doc(this.firestore, `users/${user.uid}`), { isOnline: false })).pipe(
+      switchMap(() => from(this.auth.signOut()))
+    )
   }
 }

@@ -7,7 +7,7 @@ import { TableAction } from './table-action.interface';
 @Component({
   selector: 'app-table',
   template: `
-    <mat-card class="p-5 mb-10 shadow-lg bg-gray-100">
+    <div class="p-5 mb-10 relative">
       <ng-content></ng-content>            
       <div class="my-4 pb-10"></div>
       <input (keyup)="applyFilter($event)"  class="form-control bg-inherit w-4/5 mx-auto  block px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none" id="ploFilterCtrl" placeholder="Find your item..." #input>
@@ -20,7 +20,7 @@ import { TableAction } from './table-action.interface';
           <ng-template #actionBlock>
             <ng-container matColumnDef="propName">
                 <th mat-header-cell *matHeaderCellDef>{{propName | uppercase}}</th>
-                <td mat-cell *matCellDef="let element" class="text-left cursor-pointer">
+                <td mat-cell *matCellDef="let element" class="text-right cursor-pointer">
                     <ng-container *ngFor="let action of tableActions">
                       <mat-icon (click)="action.actionCb(element)" [ngClass]="{'!text-[#5bd75b]' : action.actionIcon === 'edit', '!text-[#d52c2c]': action.actionIcon === 'delete'}">{{action.actionIcon}}</mat-icon>
                     </ng-container>
@@ -37,9 +37,14 @@ import { TableAction } from './table-action.interface';
         </tr>
       </table>
       <mat-paginator class="bg-inherit" [pageSizeOptions]="pageSizeOptions" [length]="dataSize" [pageSize]="displaySize" aria-label="Select page of Food Table" showFirstLastButtons></mat-paginator>
-    </mat-card>
+    </div>
   `,
   styles: [
+    `
+      th.mat-header-cell {
+        text-align: right !important;
+      }
+    `
   ]
 })
 export class TableComponent implements OnInit, OnChanges, AfterViewInit {

@@ -40,9 +40,10 @@ export class ChatService {
   ) {
     const colRef = collection(this.fs, 'users');
 
+    
     const users = query(colRef, where('uid', '!=', this.auth.user.uid));
     
-    onSnapshot(users, (querySnapshot) => {
+    const unSub = onSnapshot(users, (querySnapshot) => {      
       const usersArr = [];
       querySnapshot.forEach((doc) => {
         // console.log(doc.data());
@@ -50,7 +51,12 @@ export class ChatService {
       });
       // console.log(usersArr);
       this.chatUsers$.next(usersArr);
+    }, (error) => {
+      // console.log(error);
+      unSub();
     });
+
+    
   }
 
   chatUsers$ = new BehaviorSubject<User[]>([]);  

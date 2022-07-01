@@ -14,7 +14,7 @@ import { AuthService } from './shared/auth/data-access/auth.service';
       </ng-container>
     </mat-toolbar>
 
-    <main class="content bg-main-bg">
+    <main class="content bg-main-bg px-3 py-4">
       
       <router-outlet></router-outlet>
       
@@ -28,7 +28,7 @@ import { AuthService } from './shared/auth/data-access/auth.service';
   styles: [`
     .content {
       min-height: calc(100vh - 64px);
-      height: calc(100vh - 64px);
+      height: auto;
       /* padding: 25px 15px; */
       box-sizing: border-box;
     }
