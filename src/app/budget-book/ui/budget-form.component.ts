@@ -77,7 +77,7 @@ export class BudgetFormComponent implements OnInit {
   onSubmitBudgetForm() {
     if (this.budgetForm.valid) {
       if (this.budgetData) {
-        this.formSubmitCb({ id: this.budgetData.id, ...this.budgetForm.value });
+        this.formSubmitCb({ id: this.budgetData.id, itemType: this.budgetData.itemType, ...this.budgetForm.value });
       } else {
         this.formSubmitCb(this.budgetForm.value);
       }

@@ -24,22 +24,20 @@ import { BudgetType } from '../utils/budget-types.enum';
 export class BudgetCardComponent implements OnInit {
   BUDGET_TYPES = BudgetType;
   @Input() budgetCardType: BudgetType;
+  @Input() budgetTypeText: string;
   @Input() icon: string;
   
-  budgetTypeText: string;
   budget$: Observable<number>;
 
   constructor(public book: BookService) { }
 
   ngOnInit(): void {
-    this.budgetTypeText = this.budgetCardType === BudgetType.INCOME ? 'Income' : 'Expense';
-    const budgetObs = this.budgetCardType === BudgetType.INCOME ? 
-    this.book.income : this.book.expenses;
+    const budgetObs = this.book.getBudgetItems(this.budgetCardType);
 
     this.budget$ = budgetObs.pipe(
       map((values) =>
         values.reduce(
-          (accumlator, currentItem) => accumlator + currentItem.amount,
+          (accumlator, currentItem) => accumlator + currentItem['amount'],
           0
         )
       )

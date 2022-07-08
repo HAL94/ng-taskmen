@@ -10,7 +10,8 @@ import { BudgetType } from '../utils/budget-types.enum';
   selector: 'budget-item-confirm-delete',
   template: `
     <p class="text-lg font-semibold my-5 text-center">
-      Are you sure you want to delete the record {{budgetItem.name}} of type: {{budgetTypeText}}?
+      Are you sure you want to delete the record 
+      <span class="text-white bg-gray-400 p-1 rounded-xl">{{budgetItem.name}}</span> of type: <span [ngClass]="{'expense-bg': budgetItem.itemType === EXPENSE, 'income-bg': budgetItem.itemType === INCOME }" class="text-white p-1 rounded-xl">{{budgetTypeText}}</span>?
     </p>
     <div class="flex flex-row items-center justify-center">
       <button mat-stroked-button color="primary" type="button" class="!mx-1" (click)="confirmDelete()">Confirm</button>
@@ -21,18 +22,19 @@ import { BudgetType } from '../utils/budget-types.enum';
   ]
 })
 export class BudgetItemConfirmDeleteComponent implements OnInit {
-  @Input() budgetItem: BudgetItem;
-  @Input() budgetType: BudgetType;
+  @Input() budgetItem: BudgetItem;  
   budgetTypeText: string;
+  readonly EXPENSE = BudgetType.EXPENSE;
+  readonly INCOME = BudgetType.INCOME;
 
   constructor(private book: BookService, public dialog: DialogService) { }
   
   ngOnInit(): void {
-    this.budgetTypeText = this.budgetType === BudgetType.EXPENSE ? 'Expense' : 'Income';
+    this.budgetTypeText = this.budgetItem.itemType === BudgetType.EXPENSE ? 'Expense' : 'Income';
   }
 
   confirmDelete() {
-    this.book.deleteItem(this.budgetItem, this.budgetType);
+    this.book.deleteItem(this.budgetItem);
   }
 }
 

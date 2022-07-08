@@ -11,16 +11,16 @@ import { BudgetType } from '../../utils/budget-types.enum';
       <div class="container mx-auto">        
         <net-budget></net-budget>
         <div class="lg:columns-2 columns-1">
-          <budget-card [budgetCardType]="EXPENSE" [icon]="'attach_money'"></budget-card>
-          <budget-card [budgetCardType]="INCOME" [icon]="'trending_up'"></budget-card>
+          <budget-card [budgetTypeText]="'Expense'" [budgetCardType]="EXPENSE" [icon]="'attach_money'"></budget-card>
+          <budget-card [budgetTypeText]="'Income'" [budgetCardType]="INCOME" [icon]="'trending_up'"></budget-card>
         </div>
         <mat-tab-group mat-align-tabs="center">
-          <mat-tab label="Expense">
+          <mat-tab label="Expense">  
             <expense-table [editItemCb]="editItem" [addItemCb]="addItem" [confirmDeleteCb]="openConfirmDeleteDialog"></expense-table>
           </mat-tab>
           <mat-tab label="Income">
             <income-table [editItemCb]="editItem" [addItemCb]="addItem" [confirmDeleteCb]="openConfirmDeleteDialog"></income-table>
-          </mat-tab>          
+          </mat-tab>           
         </mat-tab-group>        
       </div>
 
@@ -32,8 +32,8 @@ import { BudgetType } from '../../utils/budget-types.enum';
         <budget-form [formSubmitCb]="formSubmitCb" [budgetData]="budgetData" ></budget-form>
       </ng-template>
 
-      <ng-template let-budgetItem="budgetItem" let-budgetType="budgetType" #confirmDeleteTemplate>
-        <budget-item-confirm-delete [budgetType]="budgetType" [budgetItem]="budgetItem"></budget-item-confirm-delete>
+      <ng-template let-budgetItem="budgetItem" #confirmDeleteTemplate>
+        <budget-item-confirm-delete [budgetItem]="budgetItem"></budget-item-confirm-delete>
       </ng-template>
     
   `,
@@ -63,8 +63,10 @@ export class MainBookComponent implements OnInit {
       headerText: headerText,
       template: this.addItemTemplate,
       context: {
-        formCb: (budgetItem: BudgetItem) =>
-          this.book.addItem(budgetItem, itemType),
+        formCb: (budgetItem: BudgetItem) => {
+          budgetItem.itemType = itemType;
+          this.book.addItem(budgetItem)
+        }
       },
     };
 
@@ -81,8 +83,9 @@ export class MainBookComponent implements OnInit {
       headerText: headerText,
       template: this.editItemTemplate,
       context: {
-        formCb: (budgetItem: BudgetItem) =>
-          this.book.editItem(budgetItem, itemType),
+        formCb: (budgetItem: BudgetItem) => {          
+          this.book.editItem(budgetItem)
+        },
         budgetData: budgetItem,
       },
     };
@@ -90,15 +93,14 @@ export class MainBookComponent implements OnInit {
     this.dialog.openDialog(dialogData, this.DIALGUE_OPTIONS);
   }
 
-  openConfirmDeleteDialog(budgetItem: BudgetItem, itemType: BudgetType) {
+  openConfirmDeleteDialog(budgetItem: BudgetItem) {
     const headerText = 'Confirm Record Delete';
 
     const dialogData: DialogData = {
       headerText: headerText,
       template: this.confirmDeleteTemplate,
       context: {
-        budgetItem: budgetItem,
-        budgetType: itemType,
+        budgetItem: budgetItem
       },
     };
 

@@ -9,13 +9,14 @@ import { BookService } from '../data-access/book.service';
       <span class="text-3xl font-thin">Net Budget</span>
       <span class=" tracking-wide text-4xl my-5">{{ book.netBudget$ | async }}</span>
     </div>
-    
   `,
   styles: [
   ]
 })
 export class NetBudgetComponent {
-  constructor(public book: BookService) { }
+  constructor(public book: BookService) { 
+    // this.book.netBudget();
+  }
 }
 
 @NgModule({

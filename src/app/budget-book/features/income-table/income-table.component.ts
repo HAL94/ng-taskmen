@@ -7,10 +7,10 @@ import { BudgetType } from '../../utils/budget-types.enum';
 @Component({
   selector: 'income-table',
   template: `
-    <ng-container *ngIf="book.income | async as income">
+    <ng-container>
       <app-table
         [dataProperties]="budgetItemProperties"        
-        [data]="income"
+        [data$]="book.income"
         [pageSizeOptions]="pageSizeOptions"
         [tableActions]="incomeTableActions"
         [execludedColumns]="excludes"
@@ -23,7 +23,7 @@ import { BudgetType } from '../../utils/budget-types.enum';
               <h3 class="text-2xl mb-3">Income Table</h3>
               <p class="text-sm">Add your list of income</p>
             </div>
-            <button mat-icon-button type="button" (click)="addItemCb(INCOME)">
+            <button mat-icon-button type="button" (click)="addItemCb(INCOME)" class="flex justify-center items-center border p-2 text-xl rounded">
               <mat-icon>add</mat-icon>
             </button>
           </div>
@@ -40,19 +40,19 @@ export class IncomeTableComponent implements OnInit {
 
   budgetItemProperties = Object.keys(new BudgetItem());
   INCOME = BudgetType.INCOME;
-  excludes = ['id'];
+  excludes = ['id', 'itemType', 'uid'];
   pageSizeOptions = [2, 5, 10];
 
   incomeTableActions: TableAction[] = [
     {
       actionIcon: 'edit',
       actionCb: (budgetItem: BudgetItem) =>
-        this.editItemCb(budgetItem, this.INCOME),
+        this.editItemCb(budgetItem),
     },
     {
       actionIcon: 'delete',
       actionCb: (budgetItem: BudgetItem) => {
-        this.confirmDeleteCb(budgetItem, this.INCOME);
+        this.confirmDeleteCb(budgetItem);
       },
     },
   ];

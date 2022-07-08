@@ -1,105 +1,141 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { BudgetItem } from '../utils/budget-item.model';
 import { BudgetType } from '../utils/budget-types.enum';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DialogService } from 'src/app/shared/dialog/dialog.service';
-@Injectable({
-  providedIn: 'root'
-})
-export class BookService {
-  expenses$ = new BehaviorSubject<BudgetItem[]>([]);
-  income$ = new BehaviorSubject<BudgetItem[]>([]);
-  netBudget$ = new BehaviorSubject<number>(0);
+import {
+  collection,
+  collectionData,
+  deleteDoc,
+  doc,
+  Firestore,
+  onSnapshot,
+  query,
+  where,
+} from '@angular/fire/firestore';
+import { addDoc, updateDoc } from '@firebase/firestore';
+import { AuthService } from 'src/app/shared/auth/data-access/auth.service';
 
-  constructor(private snackbar: MatSnackBar, private dialog: DialogService) { }
+@Injectable({
+  providedIn: 'root',
+})
+export class BookService {  
+  netBudget$ = new BehaviorSubject<number | string>(0);
+
+  constructor(
+    private snackbar: MatSnackBar,
+    private dialog: DialogService,
+    private fs: Firestore,
+    private auth: AuthService
+  ) {
+    this.netBudget()
+  }
 
   get expenses() {
-    return this.expenses$.asObservable();
+    if (!this.auth.user) {
+      return of(null);
+    }
+    const { uid } = this.auth.user;
+    const booksRef = collection(this.fs, 'books');
+    const userExpenseQuery = query(
+      booksRef,
+      where('uid', '==', uid),
+      where('itemType', '==', BudgetType.EXPENSE)
+    );
+    return collectionData(userExpenseQuery);
   }
 
   get income() {
-    return this.income$.asObservable();
+    if (!this.auth.user) {
+      return of(null);
+    }
+    const { uid } = this.auth.user;
+
+    const booksRef = collection(this.fs, 'books');
+    const userExpenseQuery = query(
+      booksRef,
+      where('uid', '==', uid),
+      where('itemType', '==', BudgetType.INCOME)
+    );
+    return collectionData(userExpenseQuery);
   }
 
-  addItem(item: BudgetItem, itemType: BudgetType) {
-    item.id = new Date().getTime().toString();
+  netBudget() {
+    const { uid } = this.auth.user;
+    const booksRef = collection(this.fs, 'books');
+    const userBookQuery = query(booksRef, where('uid', '==', uid));
+    const unSub = onSnapshot(userBookQuery, (qs) => {
+      let currentBudget = 0;
+      qs.forEach((doc) => {
+        const item = doc.data() as BudgetItem;
+        // console.log(item);
+        if (item.itemType === BudgetType.EXPENSE) {
+          currentBudget = currentBudget - item.amount;
+        } else {
+          currentBudget = currentBudget + item.amount;
+        }
+      });
+      this.netBudget$.next(currentBudget);
+    }, (error) => {
+      unSub();
+    });
+  }
 
-    let currentBudget = this.netBudget$.getValue();
-    let budgetList = null;
-
+  getBudgetItems(itemType: BudgetType) {
     if (itemType === BudgetType.EXPENSE) {
-      currentBudget -= item.amount;
-      budgetList = this.expenses$.getValue();
-    } else {
-      currentBudget += item.amount;
-      budgetList = this.income$.getValue();
+      return this.expenses;
     }
+    return this.income;
+  }
 
-    budgetList.push(item);
+  async addItem(item: BudgetItem) {
+    const booksRef = collection(this.fs, 'books');
+    const { uid } = this.auth.user;
 
-    this.broadcastList(budgetList, itemType);
-    this.netBudget$.next(currentBudget);
+    const createdBudgetItemRef = await addDoc(booksRef, {
+      createdAt: Date.now(),
+      uid: uid,
+      id: null,
+      ...item,
+    });
+
+    await updateDoc(createdBudgetItemRef, {
+      id: createdBudgetItemRef.id,
+    });
+
+    // let budgetList = this.budgetItems$.getValue();
+    // budgetList.push(item);
+    // this.budgetItems$.next(budgetList);
+
     const snackbarMessage = `Added Item: ${item.name}`;
     this.dialog.closeDialog();
-    this.snackbar.open(snackbarMessage, null, { duration: 2000, verticalPosition: 'top' });
+    this.snackbar.open(snackbarMessage, null, {
+      duration: 2000,
+      verticalPosition: 'top',
+    });
   }
 
-  editItem(item: BudgetItem, itemType: BudgetType) {
-    let budgetList = null;
-    if (itemType === BudgetType.EXPENSE) {
-      budgetList = this.expenses$.getValue();
-    } else {
-      budgetList = this.income$.getValue();
-    }
-    const itemIndex = budgetList.findIndex((currentItem: BudgetItem) => currentItem.id === item.id);
-    if (itemIndex >= 0) {
-      budgetList[itemIndex] = { ...item };
-      this.broadcastList(budgetList, itemType);
-      this.updateBudget();
-      const snackbarMessage = `Saved: ${item.name}`;
-      this.dialog.closeDialog();
-      this.snackbar.open(snackbarMessage, null, { duration: 2000, verticalPosition: 'top' });
-    }
+  async editItem(item: BudgetItem) {
+    const budgetItemRef = doc(this.fs, `books/${item.id}`);
+    await updateDoc(budgetItemRef, {
+      ...item
+    });
+    const snackbarMessage = `Saved: ${item.name}`;
+    this.dialog.closeDialog();
+    this.snackbar.open(snackbarMessage, null, { duration: 2000, verticalPosition: 'top' });  
   }
 
-  deleteItem(item: BudgetItem, itemType: BudgetType) {
-    let budgetList = null;
-    if (itemType === BudgetType.EXPENSE) {
-      budgetList = this.expenses$.getValue();
-    } else {
-      budgetList = this.income$.getValue();
-    }
-    const itemIndex = budgetList.findIndex((currentItem: BudgetItem) => currentItem.id === item.id);
-
-    if (itemIndex >= 0) {
-      budgetList.splice(itemIndex, 1);
-      this.broadcastList(budgetList, itemType);
-      this.updateBudget();
+  async deleteItem(item: BudgetItem) {
+    const budgetItemRef = doc(this.fs, `books/${item.id}`);
+    try {
+      await deleteDoc(budgetItemRef);      
       const snackbarMessage = `Deleted: ${item.name}`;
       this.dialog.closeDialog();
-      this.snackbar.open(snackbarMessage, null, { duration: 2000, verticalPosition: 'top' });
+      this.snackbar.open(snackbarMessage, null, { duration: 2000, verticalPosition: 'top' });      
+    } catch (error) {
+      this.snackbar.open('That failed, sorrt :(', null, { duration: 2000, verticalPosition: 'top' }); 
+      console.log(error);
     }
-  }
-
-  private broadcastList(budgetList: BudgetItem[], itemType: BudgetType) {
-    if (itemType === BudgetType.EXPENSE) {
-      this.expenses$.next([...budgetList]);
-    } else {
-      this.income$.next([...budgetList]);
-    }
-  }
-
-
-  private updateBudget() {
-    let currentBudget = this.netBudget$.getValue();
-
-    const expenses = this.expenses$.getValue().reduce((accu, current) => accu + current.amount, 0);
-    const income = this.income$.getValue().reduce((accu, current) => accu + current.amount, 0);
-
-    currentBudget = income - expenses;
-
-    this.netBudget$.next(currentBudget);
-
   }
 }

@@ -20,7 +20,7 @@ const routes: Routes = [
    { path: 'budget-book', ...canActivate(() => redirectUnauthorizedTo(['login'])),
    loadChildren: () => import('./budget-book/features/book-shell/book-shell.module').then(m => m.BookShellModule)},
 
-  { path: '', pathMatch: 'full', redirectTo: 'chat'}
+  { path: '', pathMatch: 'full', redirectTo: 'budget-book'}
 ];
 
 @NgModule({

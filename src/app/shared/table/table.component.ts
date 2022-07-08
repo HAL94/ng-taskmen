@@ -1,13 +1,14 @@
-import { AfterViewInit, Component, Input, OnChanges, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, Input, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { Observable, Subscription } from 'rxjs';
 import { TableAction } from './table-action.interface';
 
 @Component({
   selector: 'app-table',
   template: `
-    <div class="p-5 mb-10 relative">
+    <div class="p-5 mb-10 relative">      
       <ng-content></ng-content>            
       <div class="my-4 pb-10"></div>
       <input (keyup)="applyFilter($event)"  class="form-control bg-inherit w-4/5 mx-auto  block px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none" id="ploFilterCtrl" placeholder="Find your item..." #input>
@@ -45,12 +46,13 @@ import { TableAction } from './table-action.interface';
         text-align: right !important;
       }
     `
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TableComponent implements OnInit, OnChanges, AfterViewInit {
+export class TableComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Input() dataProperties: any;
-  @Input() data: any[];
+  @Input() data$: Observable<any[]>;  
   @Input() pageSizeOptions: number[];
   @Input() tableActions: TableAction[];
   @Input() execludedColumns: string[];
@@ -64,25 +66,29 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit {
   dataSize: number;
   displaySize: number;
 
+  dataSub: Subscription;
+
   constructor() { }
 
-  ngOnInit(): void {
-    this.initTable();
+  ngOnDestroy(): void {
+    this.dataSub.unsubscribe();
   }
 
-  ngOnChanges(): void {
-    this.initTable();
+  ngOnInit(): void {    
+    this.initTable()
   }
-
+  
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    this.dataSource.sort = this.sort;    
   }
-
+  
   private initTable(): void {
-    this.displayedColumns = [...this.dataProperties.filter((col: string) => !this.execludedColumns.includes(col)), 'action'];
-    this.dataSource.data = this.data;
-    this.dataSize = this.data.length;
+    this.dataSub = this.data$.subscribe((result) => {
+      this.dataSource.data = result
+      this.dataSize = result.length;
+    });
+    this.displayedColumns = [...this.dataProperties.filter((col: string) => !this.execludedColumns.includes(col)), 'action'];    
     this.displaySize = this.pageSizeOptions[0];
   }
 
