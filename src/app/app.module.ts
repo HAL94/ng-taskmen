@@ -14,11 +14,7 @@ import {
   connectFirestoreEmulator,
   enableIndexedDbPersistence,
 } from '@angular/fire/firestore';
-import {
-  connectFunctionsEmulator,
-  getFunctions,
-  provideFunctions,
-} from '@angular/fire/functions';
+
 import { getStorage, connectStorageEmulator } from 'firebase/storage';
 import { provideStorage, StorageModule } from '@angular/fire/storage';
 
@@ -43,19 +39,9 @@ import { MatDividerModule } from '@angular/material/divider';
     HttpClientModule,
     StorageModule,
     DialogModule,
-    provideFunctions(() => {
-      const app = getApp();
-      const functions = getFunctions(app);
-      if (environment.useEmulators) {
-        connectFunctionsEmulator(functions, 'localhost', 5001);
-      }
-      return functions;
-    }),
+
     provideFirebaseApp(() => {
       const app = initializeApp(environment.firebase);
-      if (environment.useEmulators) {
-        connectFunctionsEmulator(getFunctions(app), 'localhost', 5001);
-      }
       return app;
     }),
     provideAuth(() => {

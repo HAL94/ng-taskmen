@@ -77,7 +77,7 @@ export class SignupComponent implements OnInit {
 
   signUp() {
     this.auth.signUp(this.form.value).subscribe({
-      next: () => this.router.navigate(['/main/budge-book']),
+      next: () => this.router.navigate(['/main/budget-book']),
       error: (error) => this.snackbar.open(error.message)
     });
   }
