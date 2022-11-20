@@ -1,57 +1,75 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from './shared/auth/data-access/auth.service';
+import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
+import { Observable } from 'rxjs';
+import { MainAppService } from './main-app-shell/main-app.service';
 
 @Component({
   selector: 'app-root',
   template: `
-    <mat-toolbar color="primary">
-      <span>Task Men</span>
+    <mat-toolbar class="border-b shadow-md">
+      <button (click)="mainApp.toggleSidebar()" *ngIf="!(isTablet | async).matches" class="text-[#443c36] shadow-md !mr-3" mat-icon-button>
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span>
+        <img src="../assets/app_logo.svg" width="150" height="150"/>
+      </span>
       <span class="flex-auto"></span>
       <ng-container *ngIf="auth.isLoggedIn$ | async as user; else authButtons">
-        <span class="mx-2">User {{ user?.displayName }} is logged in</span>
-        <button mat-button (click)="signOut()">Sign Out</button>
+        <div class="flex flex-row justify-center items-center">
+          <mat-icon aria-hidden="false" aria-label="User Icon"
+            >account_circle</mat-icon
+          >
+          <div
+            class="flex flex-col justify-start items-center mx-2 cursor-pointer"
+          >
+            <span class="text-sm mr-auto">Welcome</span>
+            <span class="text-xs">{{ user?.displayName }}</span>
+          </div>
+        </div>
+
+        <button class="!mx-6" mat-flat-button color="warn" (click)="signOut()">
+          Sign Out
+        </button>
       </ng-container>
     </mat-toolbar>
 
-    <main class="content bg-main-bg px-3 py-4">
-      
-      <router-outlet></router-outlet>
-      
-    </main>
-
+    <router-outlet></router-outlet>
     <ng-template #authButtons>
-      <a routerLink="login" routerLinkActive="active" class="mx-2" mat-button>Login</a>
-      <a routerLink="signup" routerLinkActive="active" class="mx-2" mat-button>Signup</a>
+      <a routerLink="/auth/login" routerLinkActive="active" class="mx-2 " mat-button
+        >Login</a
+      >
+      <a routerLink="/auth/signup" routerLinkActive="active" class="mx-2" mat-button
+        >Signup</a
+      >
     </ng-template>
   `,
-  styles: [`
-    .content {
-      min-height: calc(100vh - 64px);
-      height: auto;
-      /* padding: 25px 15px; */
-      box-sizing: border-box;
-    }
-    .active {
-      border: 1px solid white;
-    }
-
-    :host ::ng-deep app-board-shell {
-      height: 100%;
-      display: block;
-    }
-  `],
+  styles: [
+    `
+      .active {
+        background: #443c36;
+        color: #fff;
+      }
+    `,
+  ],
 })
 export class AppComponent implements OnInit {
-  constructor(public auth: AuthService, private router: Router) {}
+  isTablet: Observable<BreakpointState> = this.breakpointObserver.observe('(min-width: 991px)');
+
+  constructor(
+    public auth: AuthService,
+    private router: Router,
+    private breakpointObserver: BreakpointObserver,
+    public mainApp: MainAppService) {}
 
   signOut() {
     this.auth.signOut().subscribe({
-      next: () => this.router.navigate(['login'])
+      next: () => this.router.navigate(['/auth/login']),
     });
   }
 
   ngOnInit(): void {
-    
+
   }
 }

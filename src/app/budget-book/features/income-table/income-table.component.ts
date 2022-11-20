@@ -9,7 +9,7 @@ import { BudgetType } from '../../utils/budget-types.enum';
   template: `
     <ng-container>
       <app-table
-        [dataProperties]="budgetItemProperties"        
+        [dataProperties]="budgetItemProperties"
         [data$]="book.income"
         [pageSizeOptions]="pageSizeOptions"
         [tableActions]="incomeTableActions"
@@ -23,7 +23,8 @@ import { BudgetType } from '../../utils/budget-types.enum';
               <h3 class="text-2xl mb-3">Income Table</h3>
               <p class="text-sm">Add your list of income</p>
             </div>
-            <button mat-icon-button type="button" (click)="addItemCb(INCOME)" class="flex justify-center items-center border p-2 text-xl rounded">
+            <button mat-icon-button type="button" (click)="addItemCb(INCOME)"
+            class="flex justify-center items-center border p-2 text-xl rounded !hover:scale-105 transition-all duration-300 ease-linear">
               <mat-icon>add</mat-icon>
             </button>
           </div>

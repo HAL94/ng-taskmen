@@ -4,6 +4,7 @@ import { DialogComponent } from './dialog.component';
 import { ButtonComponent } from './button.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [
@@ -13,10 +14,11 @@ import { MatDialogModule } from '@angular/material/dialog';
   imports: [
     CommonModule,
     MatButtonModule,
-    MatDialogModule
+    MatDialogModule,
+    MatIconModule
   ],
   exports: [DialogComponent, ButtonComponent],
   entryComponents: [DialogComponent]
-  
+
 })
 export class DialogModule { }

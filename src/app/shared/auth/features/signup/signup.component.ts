@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+  import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
@@ -7,7 +7,9 @@ import { AuthService } from '../../data-access/auth.service';
 @Component({
   selector: 'app-signup',
   template: `
-    <form [formGroup]="form" class="form" (submit)="signUp()">
+  <div class="container mx-auto px-6 py-3">
+    <h1 class="text-[#333] text-3xl text-center my-3">Sign Up</h1>
+    <form [formGroup]="form" class="max-w-[500px] shadow-md p-5 mx-auto" (submit)="signUp()">
       <mat-form-field class="w-full">
         <mat-label>Display Name</mat-label>
         <input
@@ -45,13 +47,14 @@ import { AuthService } from '../../data-access/auth.service';
         >
       </mat-form-field>
 
-      <button mat-raised-button color="accent" [disabled]="form.invalid">
+      <button mat-raised-button color="primary" [disabled]="form.invalid">
         Create Account
       </button>
       <a routerLink="/login" class="mat-caption ml-4"
         >Already have an account? Go to signin</a
       >
     </form>
+  </div>
   `,
   styles: [],
 })
@@ -66,15 +69,15 @@ export class SignupComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = new FormGroup({
-      displayName: new FormControl('', [Validators.minLength(3)]),
-      email: new FormControl('', [Validators.email]),
-      password: new FormControl('', [Validators.minLength(6)]),
+      displayName: new FormControl('', [Validators.required,Validators.minLength(3)]),
+      email: new FormControl('', [Validators.required, Validators.email]),
+      password: new FormControl('', [Validators.required, Validators.minLength(6)]),
     })
   }
 
   signUp() {
     this.auth.signUp(this.form.value).subscribe({
-      next: () => this.router.navigate(['chat']),
+      next: () => this.router.navigate(['/main/budge-book']),
       error: (error) => this.snackbar.open(error.message)
     });
   }

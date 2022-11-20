@@ -7,10 +7,11 @@ import { DialogData } from './dialog-data.interface';
   selector: 'app-dialog',
   template: `
      <div mat-dialog-content class="position-relative">
+      <mat-icon class="cursor-pointer" (click)="dialogRef.close()">cancel</mat-icon>
       <p class="text-center text-2xl font-thin mb-5">{{ data.headerText }}</p>
       <ng-container
         [ngTemplateOutlet]="data.template"
-        [ngTemplateOutletContext]="data.context"        
+        [ngTemplateOutletContext]="data.context"
       ></ng-container>
     </div>
   `,
