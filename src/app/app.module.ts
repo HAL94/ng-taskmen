@@ -32,6 +32,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { MatDividerModule } from '@angular/material/divider';
+
+
 @NgModule({
   declarations: [AppComponent],
   imports: [
@@ -44,30 +46,39 @@ import { MatDividerModule } from '@angular/material/divider';
     provideFunctions(() => {
       const app = getApp();
       const functions = getFunctions(app);
-      connectFunctionsEmulator(functions, 'localhost', 5001);
+      if (environment.useEmulators) {
+        connectFunctionsEmulator(functions, 'localhost', 5001);
+      }
       return functions;
     }),
     provideFirebaseApp(() => {
       const app = initializeApp(environment.firebase);
-      connectFunctionsEmulator(getFunctions(app), 'localhost', 5001);
-
+      if (environment.useEmulators) {
+        connectFunctionsEmulator(getFunctions(app), 'localhost', 5001);
+      }
       return app;
     }),
     provideAuth(() => {
       const auth = getAuth();
-      connectAuthEmulator(auth, 'http://localhost:9099');
+      if (environment.useEmulators) {
+        connectAuthEmulator(auth, 'http://localhost:9099');
+      }
       return auth;
     }),
     provideFirestore(() => {
       const firestore = getFirestore();
-      connectFirestoreEmulator(firestore, 'localhost', 8888);
+      if (environment.useEmulators) {
+        connectFirestoreEmulator(firestore, 'localhost', 8888);
+      }
       enableIndexedDbPersistence(firestore);
       return firestore;
     }),
     provideStorage(() => {
       const app = getApp();
       const storage = getStorage(app);
-      connectStorageEmulator(storage, 'localhost', 9199);
+      if (environment.useEmulators) {
+        connectStorageEmulator(storage, 'localhost', 9199);
+      }
       return storage;
     }),
     MatSnackBarModule,
