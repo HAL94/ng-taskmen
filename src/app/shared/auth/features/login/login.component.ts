@@ -10,7 +10,8 @@ import { AuthService } from '../../data-access/auth.service';
     <div class="container mx-auto px-6 py-3">
       <h1 class="text-[#333] text-3xl text-center my-3">Login</h1>
       <form [formGroup]="form" class="max-w-[500px] shadow-md p-5 mx-auto" (submit)="signIn()">
-        <h1 class='text-sm text-center text-[#443c36]'>username: test@test.com, <br/> password: 123456</h1>
+        <h1 class='text-sm text-center text-[#443c36]'>First User: username: test@test.com, <br/> password: 123456</h1>
+        <h1 class='text-sm text-center text-[#443c36]'>Second User: username: jason.limbu@gmail.com, <br/> password: 123456</h1>
         <mat-form-field class="w-full">
           <mat-label>Email</mat-label>
           <input
