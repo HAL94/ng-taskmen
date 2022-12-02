@@ -1,6 +1,6 @@
 # Ng Taskmen
 
-A simple app to keep track of expenses and income. 
+A simple app composed of small suite of apps to keep track of expenses and income, communicate with users, manage tasks and possibly more. 
 
 ## Stack:
 - Firebase as a Backend
