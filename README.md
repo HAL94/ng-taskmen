@@ -8,13 +8,13 @@ A simple app to keep track of expenses and income.
 
 ## Modules (To be developed):
 - Role-based access priviliges.
-- Chat module: A simplified chatting feature of the app.
-- Budgeting Module: An expense and income tracking module.
-- Task Module: A Simple Kanban-style Task Management.
 - Job Module: A listing of jobs detailing cost, assignment with comments feature.
 
 ## Achieved:
 - Email/Password Authentication with Firebase.
+- Chat module: A simplified chatting feature of the app.
+- Budgeting Module: An expense and income tracking module.
+- Task Module: A Simple Kanban-style Task Management.
 
 ## Technical Features:
 - A clean and simple UI/UX.
